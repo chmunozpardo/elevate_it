@@ -6,7 +6,7 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
   <persistence-unit name="elevateIT" transaction-type="RESOURCE_LOCAL">
   <provider>org.hibernate.ejb.HibernatePersistence</provider>
   <properties>
-    <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/elevateIT" />
+    <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/elevate_it" />
     <property name="javax.persistence.jdbc.user" value="root" />
     <property name="javax.persistence.jdbc.password" value="root" />
     <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />

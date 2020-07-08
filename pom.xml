@@ -25,12 +25,12 @@
     <jacoco.unit-tests.limit.method-complexity>5</jacoco.unit-tests.limit.method-complexity>
   </properties>
   <dependencies>
-    <!-- PI4J dependencies for GPIO and I2C communication
+    <!-- PI4J dependencies for GPIO and I2C communication -->
     <dependency>
       <groupId>com.pi4j</groupId>
       <artifactId>pi4j-core</artifactId>
       <version>1.2-SNAPSHOT</version>
-    </dependency> -->
+    </dependency>
 
     <!-- JPA -->
     <dependency>
@@ -76,7 +76,7 @@
         <version>3.8.1</version>
         <configuration>
           <excludes>
-            <exclude>**/Hardware/**</exclude>
+            <!--<exclude>**/Hardware/**</exclude> -->
           </excludes>
         </configuration>
       </plugin>

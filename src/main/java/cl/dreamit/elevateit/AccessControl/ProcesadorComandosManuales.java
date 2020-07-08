@@ -12,6 +12,7 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.ComandoManual;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.Controlador;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.LogAcceso;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso;
+import cl.dreamit.elevateit.Hardware.Relay;
 import cl.dreamit.elevateit.Utils.Log;
 import cl.dreamit.elevateit.Utils.Util;
 
@@ -62,7 +63,8 @@ public class ProcesadorComandosManuales {
             log.codigo_medio_acceso = String.format("%d", comandoManual.id_usuario);
             LogsAcceso.save(log);
             // TODO activar relé
-            //Relay.open();
+            Relay rele = new Relay(0x20);
+            rele.openRelay(numeroCanalSolicitado);
         } catch (Exception ex) {}
     }
 }

@@ -10,6 +10,8 @@ import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
+import cl.dreamit.elevateit.Configuration.CONF;
+
 public class Relay {
 
     private I2CBus busI2C;
@@ -43,8 +45,8 @@ public class Relay {
         new Thread(() -> {
             try{
                 deviceI2C.write(0x06, (byte)0x00);
-                deviceI2C.write(0x02, (byte)0xFF);
-                Thread.sleep(5000);
+                deviceI2C.write(0x02, (byte)(0x01 << puntoAcceso));
+                Thread.sleep(CONF.DEFAULT_OPEN_TIME);
                 deviceI2C.write(0x02, (byte)0x00);
             } catch(Exception ignored) {}
         }).start();

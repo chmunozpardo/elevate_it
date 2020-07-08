@@ -23,7 +23,7 @@ public final class App{
 
         System.out.println("Hello World!");
 
-        //Synchronizer.registrarDispositivo("464051");
+        // Synchronizer.registrarDispositivo("458208");
 
         new Synchronizer().start();
     }
