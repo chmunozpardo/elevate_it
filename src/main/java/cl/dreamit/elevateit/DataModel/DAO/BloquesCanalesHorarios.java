@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.BloqueHorario;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -28,6 +29,7 @@ public class BloquesCanalesHorarios {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static List<BloqueHorario> getByDiaHora(int id_canal_horario, String nombreDia, String horaActual) {
@@ -43,6 +45,13 @@ public class BloquesCanalesHorarios {
         .setParameter("id_canal_horario", id_canal_horario)
         .setParameter("nombreDia", nombreDia)
         .setParameter("horaActual", horaActual);
-        return (List<BloqueHorario>) query.getResultList();
+        List<BloqueHorario> outputList;
+        try{
+            outputList = (List<BloqueHorario>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputList = null;
+        }
+        entityManager.close();
+        return outputList;
     }
 }

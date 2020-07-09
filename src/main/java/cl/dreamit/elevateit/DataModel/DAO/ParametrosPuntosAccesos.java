@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.ParametroPuntoAcceso;
 import cl.dreamit.elevateit.Utils.PersistenceManager;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -25,6 +26,13 @@ public class ParametrosPuntosAccesos {
         )
         .setParameter("idPuntoAcceso", idPuntoAcceso)
         .setParameter("nombreParametro", nombreParametro);
-        return (ParametroPuntoAcceso) query.getSingleResult();
+        ParametroPuntoAcceso outputResult;
+        try {
+            outputResult = (ParametroPuntoAcceso) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

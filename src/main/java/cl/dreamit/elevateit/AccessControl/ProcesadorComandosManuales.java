@@ -7,12 +7,13 @@ import cl.dreamit.elevateit.DataModel.Const.ReadSource;
 import cl.dreamit.elevateit.DataModel.DAO.Configuraciones;
 import cl.dreamit.elevateit.DataModel.DAO.Controladores;
 import cl.dreamit.elevateit.DataModel.DAO.LogsAcceso;
+import cl.dreamit.elevateit.DataModel.DAO.RespuestasComandos;
 import cl.dreamit.elevateit.DataModel.Entities.FullAccess.Configuracion;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.ComandoManual;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.Controlador;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.LogAcceso;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso;
-import cl.dreamit.elevateit.Hardware.Relay;
+import cl.dreamit.elevateit.DataModel.Entities.GK2.RespuestaComandoManual;
 import cl.dreamit.elevateit.Utils.Log;
 import cl.dreamit.elevateit.Utils.Util;
 
@@ -21,19 +22,12 @@ public class ProcesadorComandosManuales {
     public final static String COMANDO_OPEN = "OUTPUT:OPEN:";
 
     public static void procesarComandos(ComandoManual[] comandos) {
-        //Lanza un Thread para procesar dichos comandos.
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                for (ComandoManual comandoManual : comandos) {
-                    Log.error("Procesando Comando Manual: " + comandoManual);
-                    if (comandoManual.comando.startsWith(COMANDO_OPEN)) {
-                        procesar_comando_open(comandoManual);
-                    }
-                }
+        for (ComandoManual comandoManual : comandos) {
+            Log.error("Procesando Comando Manual: " + comandoManual);
+            if (comandoManual.comando.startsWith(COMANDO_OPEN)) {
+                procesar_comando_open(comandoManual);
             }
-        }.start();
+        }
     }
 
     private static void procesar_comando_open(ComandoManual comandoManual) {
@@ -61,10 +55,13 @@ public class ProcesadorComandosManuales {
             log.fecha_registro = Util.getDateTime(new Date());
             log.id_origen_lectura = ReadSource.SOURCE_SOFTWARE;
             log.codigo_medio_acceso = String.format("%d", comandoManual.id_usuario);
-            LogsAcceso.save(log);
+            LogsAcceso.INSTANCE.save(log);
+            RespuestasComandos.INSTANCE.save(
+                new RespuestaComandoManual(comandoManual.id, "OK")
+            );
             // TODO activar relé
-            Relay rele = new Relay(0x20);
-            rele.openRelay(numeroCanalSolicitado);
+            /* cl.dreamit.elevateit.Hardware.Relay rele = new cl.dreamit.elevateit.Hardware.Relay(0x20);
+            rele.openRelay(numeroCanalSolicitado); */
         } catch (Exception ex) {}
     }
 }

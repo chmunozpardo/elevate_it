@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.ConjuntoReserva;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -26,6 +27,7 @@ public class ConjuntosReservas {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static ConjuntoReserva getByID(int id_conjunto_reserva){
@@ -35,7 +37,14 @@ public class ConjuntosReservas {
             "WHERE id = :id_conjunto_reserva"
         )
         .setParameter("id_conjunto_reserva", id_conjunto_reserva);
-        return (ConjuntoReserva) query.getResultList();
+        ConjuntoReserva outputResult;
+        try{
+            outputResult = (ConjuntoReserva) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static ConjuntoReserva getConjuntoReservaCodigoReserva(String codigoAcceso){
@@ -45,6 +54,13 @@ public class ConjuntosReservas {
             "WHERE codigo_reserva LIKE :codigoAcceso"
         )
         .setParameter("codigoAcceso", codigoAcceso);
-        return (ConjuntoReserva) query.getResultList();
+        ConjuntoReserva outputResult;
+        try{
+            outputResult = (ConjuntoReserva) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

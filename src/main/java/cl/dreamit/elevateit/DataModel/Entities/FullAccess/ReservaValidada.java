@@ -25,7 +25,6 @@ public class ReservaValidada extends UploadableEntity {
     public int numeroCanal;
 
     public ReservaValidada() {
-        //Constructor vacio necesario para Android Room
     }
 
     public ReservaValidada(Reserva r, int idControlador, int numeroCanal) {

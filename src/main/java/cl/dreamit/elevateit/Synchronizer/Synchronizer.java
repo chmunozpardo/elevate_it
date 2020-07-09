@@ -23,6 +23,7 @@ import cl.dreamit.elevateit.DataModel.DAO.Reservas;
 import cl.dreamit.elevateit.DataModel.DAO.ReservasValidadas;
 import cl.dreamit.elevateit.DataModel.DAO.RespuestasComandos;
 import cl.dreamit.elevateit.DataModel.DAO.TarjetasAcceso;
+import cl.dreamit.elevateit.DataModel.DAO.UploadableDAO;
 import cl.dreamit.elevateit.DataModel.Entities.FullAccess.Configuracion;
 import cl.dreamit.elevateit.DataModel.Entities.FullAccess.UploadableEntity;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.CanalHorario;
@@ -49,13 +50,19 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Synchronizer extends Thread {
     private String targetDatabase = null;
     private String apiToken = null;
     private String apiURL = null;
     private Long lastSyncTimestamp;
+    private List<UploadableDAO> tablasSubida = Arrays.asList(
+        LogsAcceso.INSTANCE,
+        RespuestasComandos.INSTANCE,
+        ReservasValidadas.INSTANCE
+    );
 
-    public Synchronizer(){
+    public Synchronizer() {
         apiToken = Configuraciones.getParametro("apitoken").valor;
         targetDatabase = Configuraciones.getParametro("base_datos").valor;
         apiURL = Configuraciones.getParametro("API_URL").valor;
@@ -75,10 +82,7 @@ public class Synchronizer extends Thread {
                 Thread.sleep(CONF.TIME_SYNC);
             } catch (InterruptedException ex){}
             SyncMessage message = new SyncMessage(lastSyncTimestamp);
-
-            //Verifica si hay datos que enviar a la nube.
             Map<String, Long> ultimosID = cargarDatos(message);
-
             Map<String, Object> postData = new HashMap<>();
             postData.put("api_token", apiToken);
             postData.put("nombreInstancia", targetDatabase);
@@ -92,16 +96,13 @@ public class Synchronizer extends Thread {
             try {
                 RespuestaSincronizacion syncResponse = new Gson().fromJson(respuesta, RespuestaSincronizacion.class);
                 if (syncResponse.estado.equals("OK")) {
-                    //bien. carga el nuevo timestamp de ultima sincronización.
                     lastSyncTimestamp = syncResponse.currentTimestamp;
                     //actualizarFechaHora(syncResponse.localTime); //Descartado. Solo Apps a nivel de sistema pueden hacer esto.
-                    //Almacena todos los medios de acceso obtenidos.
                     TarjetasAcceso.save(syncResponse.tarjetas);
-                    //Los canales horarios, Reservas y Controladores contienen estructuras compuestas.
                     //TODO podría ser posible almacenar todo y filo; con un algoritmo de limpieza no debería ser problema el almacenamiento
-                    almacenarCanalesHorarios(syncResponse.canalesHorarios);
                     almacenarReservas(syncResponse.reservas);
                     almacenarControlador(syncResponse.controlador);
+                    almacenarCanalesHorarios(syncResponse.canalesHorarios);
                     //Los comandosManuales deben ser procesados. Pero en un hilo independiente.
                     ProcesadorComandosManuales.procesarComandos(syncResponse.comandos);
                     ComandosManuales.save(syncResponse.comandos); //Los Comandos manuales no tiene sentido almacenarlos; Solo procesarlos.
@@ -233,61 +234,24 @@ public class Synchronizer extends Thread {
 
     private Map<String, Long> cargarDatos(SyncMessage sm) {
         Map<String, Long> ultimosID = new HashMap<>();
-
-        String tabla = LogsAcceso.getTable();
-        int lastLog = getLastUploadID(tabla);
-        List<UploadableEntity> data =
-            new ArrayList<UploadableEntity>(LogsAcceso.getNewerThan(lastLog));
-        if (data != null && !data.isEmpty()) {
-            //LOG.error("Cargando datos de tabla: %s: %s", tabla, data.toString());
-            long idMaximo = 0L;
-            for (UploadableEntity ue : data) {
-                if (ue.getID() > idMaximo) {
-                    idMaximo = ue.getID();
+        for (int i = 0; i < tablasSubida.size(); i++){
+            String tabla = tablasSubida.get(i).getTable();
+            int lastLog = getLastUploadID(tabla);
+            List<UploadableEntity> data = tablasSubida.get(i).getNewerThan(lastLog);
+            if (data != null && !data.isEmpty()) {
+                //LOG.error("Cargando datos de tabla: %s: %s", tabla, data.toString());
+                long idMaximo = 0L;
+                for (UploadableEntity ue : data) {
+                    if (ue.getID() > idMaximo) {
+                        idMaximo = ue.getID();
+                    }
                 }
+                ultimosID.put(tabla, idMaximo);
+                sm.uploadData.add(
+                    new DataSincronizacionSubida(tabla, data)
+                );
             }
-            ultimosID.put(tabla, idMaximo);
-            sm.uploadData.add(
-                new DataSincronizacionSubida(tabla, data)
-            );
         }
-
-        tabla = RespuestasComandos.getTable();
-        lastLog = getLastUploadID(tabla);
-        data =
-            new ArrayList<UploadableEntity>(RespuestasComandos.getNewerThan(lastLog));
-        if (data != null && !data.isEmpty()) {
-            //LOG.error("Cargando datos de tabla: %s: %s", tabla, data.toString());
-            long idMaximo = 0L;
-            for (UploadableEntity ue : data) {
-                if (ue.getID() > idMaximo) {
-                    idMaximo = ue.getID();
-                }
-            }
-            ultimosID.put(tabla, idMaximo);
-            sm.uploadData.add(
-                new DataSincronizacionSubida(tabla, data)
-            );
-        }
-
-        tabla = ReservasValidadas.getTable();
-        lastLog = getLastUploadID(tabla);
-        data =
-            new ArrayList<UploadableEntity>(ReservasValidadas.getNewerThan(lastLog));
-        if (data != null && !data.isEmpty()) {
-            //LOG.error("Cargando datos de tabla: %s: %s", tabla, data.toString());
-            long idMaximo = 0L;
-            for (UploadableEntity ue : data) {
-                if (ue.getID() > idMaximo) {
-                    idMaximo = ue.getID();
-                }
-            }
-            ultimosID.put(tabla, idMaximo);
-            sm.uploadData.add(
-                new DataSincronizacionSubida(tabla, data)
-            );
-        }
-
         return ultimosID;
     }
 

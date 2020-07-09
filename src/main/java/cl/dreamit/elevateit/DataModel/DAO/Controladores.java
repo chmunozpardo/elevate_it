@@ -28,6 +28,7 @@ public class Controladores {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static void save(Controlador controlador){
@@ -37,6 +38,7 @@ public class Controladores {
         entityManager.flush();
         entityManager.clear();
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static void save(Controlador[] controladores){
@@ -50,6 +52,7 @@ public class Controladores {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static Controlador getByID(int id){
@@ -64,6 +67,7 @@ public class Controladores {
         } catch(NoResultException ex){
             outputControlador = null;
         }
+        entityManager.close();
         return outputControlador;
     }
 }

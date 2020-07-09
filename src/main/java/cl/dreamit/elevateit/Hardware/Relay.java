@@ -11,7 +11,7 @@ import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
 import cl.dreamit.elevateit.Configuration.CONF;
-
+@SuppressWarnings("serial")
 public class Relay {
 
     private I2CBus busI2C;

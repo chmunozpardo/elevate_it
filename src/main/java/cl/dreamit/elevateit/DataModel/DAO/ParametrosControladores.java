@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.ParametroControlador;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -29,6 +30,13 @@ public class ParametrosControladores {
         )
         .setParameter("idControlador", idControlador)
         .setParameter("nombreParametro", nombreParametro);
-        return (ParametroControlador) query.getSingleResult();
+        ParametroControlador outputResult;
+        try{
+            outputResult = (ParametroControlador) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.ResumenTarjetaControlador;
 import cl.dreamit.elevateit.Utils.PersistenceManager;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -31,6 +32,7 @@ public class TarjetasAcceso {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
 
@@ -42,7 +44,14 @@ public class TarjetasAcceso {
         .setParameter("cardType", cardType)
         .setParameter("card_code_1", card_code_1)
         .setParameter("card_code_2", card_code_2);
-        return (ResumenTarjetaControlador) query.getSingleResult();
+        ResumenTarjetaControlador outputResult;
+        try {
+            outputResult = (ResumenTarjetaControlador) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static void eliminar(ResumenTarjetaControlador rtc){

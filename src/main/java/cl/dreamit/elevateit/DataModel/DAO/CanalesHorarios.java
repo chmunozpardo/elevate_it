@@ -28,6 +28,7 @@ public class CanalesHorarios {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static CanalHorario getById(int id_canal_horario){
@@ -44,6 +45,7 @@ public class CanalesHorarios {
         } catch (NoResultException ex){
             outputCanalHorario = null;
         }
+        entityManager.close();
         return outputCanalHorario;
     }
 }

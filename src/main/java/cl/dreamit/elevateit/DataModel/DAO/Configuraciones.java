@@ -27,6 +27,7 @@ public class Configuraciones {
         } catch(NoResultException ex) {
             outConfiguracion = null;
         }
+        entityManager.close();
         return outConfiguracion;
     }
 
@@ -42,6 +43,7 @@ public class Configuraciones {
         } catch(NoResultException ex) {
             outConfiguracion = null;
         }
+        entityManager.close();
         return outConfiguracion;
     }
 
@@ -52,5 +54,6 @@ public class Configuraciones {
         entityManager.flush();
         entityManager.clear();
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 }

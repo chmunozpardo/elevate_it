@@ -3,7 +3,6 @@ package cl.dreamit.elevateit.DataModel;
 import java.util.List;
 
 import cl.dreamit.elevateit.DataModel.Entities.FullAccess.UploadableEntity;
-import cl.dreamit.elevateit.DataModel.Entities.GK2.LogAcceso;
 
 public class DataSincronizacionSubida {
     String tabla;

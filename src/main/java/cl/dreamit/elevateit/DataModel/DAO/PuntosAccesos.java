@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -27,6 +28,7 @@ public class PuntosAccesos {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static PuntoAcceso getPuntoAccesoControlador(int id, int canal){
@@ -36,7 +38,14 @@ public class PuntosAccesos {
         )
         .setParameter("id", id)
         .setParameter("canal", canal);
-        return (PuntoAcceso) query.getSingleResult();
+        PuntoAcceso outputResult;
+        try {
+            outputResult = (PuntoAcceso) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static List<PuntoAcceso> getPuntosAccesoControlador(int id){
@@ -45,6 +54,13 @@ public class PuntosAccesos {
             "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id"
         )
         .setParameter("id", id);
-        return (List<PuntoAcceso>) query.getResultList();
+        List<PuntoAcceso> outputResult;
+        try {
+            outputResult = (List<PuntoAcceso>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.Persona;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -26,6 +27,7 @@ public class Personas {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static Persona getByCredencial(int idTipoCredencial, String credencial) {
@@ -37,7 +39,14 @@ public class Personas {
         )
         .setParameter("idTipoCredencial", idTipoCredencial)
         .setParameter("credencial", credencial);
-        return (Persona) query.getSingleResult();
+        Persona outputResult;
+        try {
+            outputResult = (Persona) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static Persona getById(int id) {
@@ -46,6 +55,13 @@ public class Personas {
             "SELECT p FROM Persona p WHERE id = :id"
         )
         .setParameter("id", id);
-        return (Persona) query.getSingleResult();
+        Persona outputResult;
+        try {
+            outputResult = (Persona) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

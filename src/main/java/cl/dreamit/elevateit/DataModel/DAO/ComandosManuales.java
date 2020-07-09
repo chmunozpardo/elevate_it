@@ -26,5 +26,6 @@ public class ComandosManuales {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 }

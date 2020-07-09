@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.Reserva;
 import cl.dreamit.elevateit.Utils.PersistenceManager;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -28,6 +29,7 @@ public class Reservas {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static List<Reserva> getAll(){
@@ -35,7 +37,14 @@ public class Reservas {
         Query query = entityManager.createQuery(
             "SELECT r FROM Reserva r"
         );
-        return (List<Reserva>) query.getResultList();
+        List<Reserva> outputResult;
+        try {
+            outputResult = (List<Reserva>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static List<Reserva> getReservasValidasFecha(String fechaValidez) {
@@ -47,7 +56,14 @@ public class Reservas {
         )
         .setParameter("fechaValidez", fechaValidez)
         .setParameter("fechaValidez", fechaValidez);
-        return (List<Reserva>) query.getResultList();
+        List<Reserva> outputResult;
+        try {
+            outputResult = (List<Reserva>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static List<Reserva> getReservasPersonaFecha(int id_persona, String fechaValidez){
@@ -60,7 +76,14 @@ public class Reservas {
         )
         .setParameter("fechaValidez", fechaValidez)
         .setParameter("id_persona", id_persona);
-        return (List<Reserva>) query.getResultList();
+        List<Reserva> outputResult;
+        try {
+            outputResult = (List<Reserva>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva) {
@@ -70,7 +93,14 @@ public class Reservas {
             "WHERE id_conjunto_reserva = :idConjuntoReserva"
         )
         .setParameter("idConjuntoReserva", idConjuntoReserva);
-        return (List<Reserva>) query.getResultList();
+        List<Reserva> outputResult;
+        try {
+            outputResult = (List<Reserva>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 
     public static List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva, String fechaValidez){
@@ -83,6 +113,13 @@ public class Reservas {
         )
         .setParameter("idConjuntoReserva", idConjuntoReserva)
         .setParameter("fechaValidez", fechaValidez);
-        return (List<Reserva>) query.getResultList();
+        List<Reserva> outputResult;
+        try {
+            outputResult = (List<Reserva>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

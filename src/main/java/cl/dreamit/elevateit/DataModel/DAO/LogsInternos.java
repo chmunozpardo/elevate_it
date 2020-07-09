@@ -17,6 +17,8 @@ public class LogsInternos {
         entityManager.getTransaction().begin();
         entityManager.persist(log);
         entityManager.flush();
+        entityManager.clear();
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 }

@@ -4,6 +4,7 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.Estacionamiento;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -26,6 +27,7 @@ public class Estacionamientos {
             entityManager.clear();
         }
         entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public static Estacionamiento getByID(int id_estacionamiento){
@@ -33,6 +35,13 @@ public class Estacionamientos {
             "SELECT e FROM Estacionamiento e WHERE id = :id_estacionamiento"
         )
         .setParameter("id_estacionamiento", id_estacionamiento);
-        return (Estacionamiento) query.getSingleResult();
+        Estacionamiento outputResult;
+        try{
+            outputResult = (Estacionamiento) query.getSingleResult();
+        } catch(NoResultException ex){
+            outputResult = null;
+        }
+        entityManager.close();
+        return outputResult;
     }
 }

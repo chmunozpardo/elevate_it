@@ -9,7 +9,7 @@ public class CONF {
     /****************** VARIABLES QUE DETERMINAN TIEMPO ******************/
 
     // Tiempo en que ejecutara un nuevo ciclo de sincronización
-    public static int TIME_SYNC = 2000;
+    public static int TIME_SYNC = 1000;
 
     // Tiempo que se mostrar un mensaje de error
     public final static int TIME_DIALOG_ERROR = 3000;
