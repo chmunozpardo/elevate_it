@@ -24,8 +24,6 @@ public class Controladores {
         for (Iterator<Controlador> it = controladoresList.iterator(); it.hasNext();) {
             Controlador enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();
@@ -35,8 +33,6 @@ public class Controladores {
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.merge(controlador);
-        entityManager.flush();
-        entityManager.clear();
         entityManager.getTransaction().commit();
         entityManager.close();
     }
@@ -48,8 +44,6 @@ public class Controladores {
         for (Iterator<Controlador> it = controladoresList.iterator(); it.hasNext();) {
             Controlador enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

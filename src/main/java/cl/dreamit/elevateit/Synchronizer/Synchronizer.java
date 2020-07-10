@@ -51,7 +51,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class Synchronizer extends Thread {
+public class Synchronizer implements Runnable {
     private String targetDatabase = null;
     private String apiToken = null;
     private String apiURL = null;

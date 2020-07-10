@@ -20,7 +20,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     public List<LogAcceso> getAll(){
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
-            "SELECT r FROM registros_acceso r"
+            "SELECT r FROM LogAcceso r"
         );
         List<LogAcceso> outputResult;
         try{
@@ -52,10 +52,11 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     public List<LogAcceso> getNewerThan(long lastID, long offset){
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
-            "SELECT * FROM registros_acceso WHERE id > :lastID ORDER BY id ASC LIMIT :offset,100"
+            "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
         )
-        .setParameter("lastID", lastID)
-        .setParameter("offset", offset);
+        .setFirstResult((int) offset)
+        .setMaxResults(100)
+        .setParameter("lastID", lastID);
         List<LogAcceso> outputResult;
         try{
             outputResult = (List<LogAcceso>) query.getResultList();
@@ -70,8 +71,6 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.merge(acceso);
-        entityManager.flush();
-        entityManager.clear();
         entityManager.getTransaction().commit();
         entityManager.close();
     }

@@ -51,8 +51,6 @@ public class Configuraciones {
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.merge(p);
-        entityManager.flush();
-        entityManager.clear();
         entityManager.getTransaction().commit();
         entityManager.close();
     }

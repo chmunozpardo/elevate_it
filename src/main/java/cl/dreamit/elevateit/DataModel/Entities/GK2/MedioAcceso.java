@@ -46,7 +46,18 @@ public class MedioAcceso {
                 }
                 break;
             case CardTypes.MIFARE_ID:
-                retorno[0] = Long.parseLong(codigoAcceso);
+                if (codigoAcceso.contains(".")) {
+                    elements = codigoAcceso.split(".");
+                    retorno[0] = Long.parseLong(elements[0]);
+                    retorno[1] = Long.parseLong(elements[1]);
+                } else if (codigoAcceso.contains("-")) {
+                    elements = codigoAcceso.split("-");
+                    retorno[0] = Long.parseLong(elements[0]);
+                    retorno[1] = Long.parseLong(elements[1]);
+                } else {
+                    retorno[0] = 0;
+                    retorno[1] = Long.parseLong(codigoAcceso);
+                }
                 break;
             default:
                 return null;

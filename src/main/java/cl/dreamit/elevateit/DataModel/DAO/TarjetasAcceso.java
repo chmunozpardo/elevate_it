@@ -28,8 +28,6 @@ public class TarjetasAcceso {
         for (Iterator<ResumenTarjetaControlador> it = rtcList.iterator(); it.hasNext();) {
             ResumenTarjetaControlador enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();
@@ -39,8 +37,9 @@ public class TarjetasAcceso {
     public static ResumenTarjetaControlador getTarjeta(int cardType, long card_code_1, long card_code_2){
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
-            "SELECT * FROM resumenTarjetaControlador WHERE card_type = :cardType AND card_code_1 = :card_code_1 AND card_code_2 = :card_code_2 ORDER BY id DESC LIMIT 1"
+            "SELECT r FROM ResumenTarjetaControlador r WHERE card_type = :cardType AND card_code_1 = :card_code_1 AND card_code_2 = :card_code_2 ORDER BY id DESC"
         )
+        .setMaxResults(1)
         .setParameter("cardType", cardType)
         .setParameter("card_code_1", card_code_1)
         .setParameter("card_code_2", card_code_2);

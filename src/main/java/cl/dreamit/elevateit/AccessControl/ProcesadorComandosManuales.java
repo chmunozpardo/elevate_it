@@ -60,8 +60,8 @@ public class ProcesadorComandosManuales {
                 new RespuestaComandoManual(comandoManual.id, "OK")
             );
             // TODO activar relé
-            /* cl.dreamit.elevateit.Hardware.Relay rele = new cl.dreamit.elevateit.Hardware.Relay(0x20);
-            rele.openRelay(numeroCanalSolicitado); */
+            cl.dreamit.elevateit.Hardware.Relay rele = new cl.dreamit.elevateit.Hardware.Relay(0x20);
+            rele.openRelay(numeroCanalSolicitado);
         } catch (Exception ex) {}
     }
 }

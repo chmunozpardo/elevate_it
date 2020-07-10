@@ -42,7 +42,9 @@ public class ConjuntoReserva {
     public String tipo_sujeto;
     public int id_tipo_reserva;
     public int id_tipo_sujeto;
+    @Column(length=200)
     public String fecha_inicio_index;
+    @Column(length=200)
     public String fecha_fin_index;
     public String frecuencia;
     public String anfitrion;
@@ -50,6 +52,7 @@ public class ConjuntoReserva {
     public String QR;
     public String comentario;
 
+    @Column(length=200)
     public String codigo_reserva;
     public String hash_validacion;
 

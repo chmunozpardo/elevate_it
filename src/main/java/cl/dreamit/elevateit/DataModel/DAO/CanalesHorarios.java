@@ -24,8 +24,6 @@ public class CanalesHorarios {
         for (Iterator<CanalHorario> it = canalesList.iterator(); it.hasNext();) {
             CanalHorario enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

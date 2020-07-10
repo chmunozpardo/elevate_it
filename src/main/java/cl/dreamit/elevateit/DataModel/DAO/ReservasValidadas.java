@@ -18,6 +18,11 @@ public enum ReservasValidadas implements UploadableDAO<ReservaValidada>{
     private static EntityManager entityManager;
 
     public void save(ReservaValidada r){
+        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        entityManager.getTransaction().begin();
+        entityManager.persist(r);
+        entityManager.getTransaction().commit();
+        entityManager.close();
     }
 
     public List<ReservaValidada> getNewerThan(int lastID){

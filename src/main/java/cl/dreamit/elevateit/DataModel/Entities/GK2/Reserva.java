@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Column;
 import javax.persistence.Transient;
 
 import cl.dreamit.elevateit.DataModel.Const.Operation;
@@ -45,7 +46,9 @@ public class Reserva {
     public int id_proveedor;
     public int id_colaborador;
     public int id_estacionamiento;
+    @Column(length=200)
     public String fecha_inicio;
+    @Column(length=200)
     public String fecha_fin;
     public String hora_inicio;
     public String hora_fin;

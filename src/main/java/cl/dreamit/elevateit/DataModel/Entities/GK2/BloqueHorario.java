@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
+import javax.persistence.Column;
 
 import com.google.gson.Gson;
 
@@ -27,6 +28,7 @@ public class BloqueHorario {
     //@GeneratedValue
     public Integer id;
     public Integer id_canal_horario;
+    @Column(length=200)
     public String dia;
     public String inicio;
     public String fin;

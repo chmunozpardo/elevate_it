@@ -22,8 +22,6 @@ public class ComandosManuales {
         for (Iterator<ComandoManual> it = comandosList.iterator(); it.hasNext();) {
             ComandoManual enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

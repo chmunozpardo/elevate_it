@@ -25,8 +25,6 @@ public class Reservas {
         for (Iterator<Reserva> it = reservasList.iterator(); it.hasNext();) {
             Reserva enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();
@@ -106,7 +104,7 @@ public class Reservas {
     public static List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva, String fechaValidez){
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
-            "SELECT * FROM reserva " +
+            "SELECT r FROM Reserva r " +
             "WHERE id_conjunto_reserva = :idConjuntoReserva " +
             "AND fecha_inicio_index <= :fechaValidez" +
             "AND fecha_fin_index >= :fechaValidez"

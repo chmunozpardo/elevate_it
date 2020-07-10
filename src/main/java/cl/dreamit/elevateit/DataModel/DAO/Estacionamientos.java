@@ -23,8 +23,6 @@ public class Estacionamientos {
         for (Iterator<Estacionamiento> it = reservasList.iterator(); it.hasNext();) {
             Estacionamiento enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

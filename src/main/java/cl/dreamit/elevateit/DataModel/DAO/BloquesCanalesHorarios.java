@@ -25,8 +25,6 @@ public class BloquesCanalesHorarios {
         for (Iterator<BloqueHorario> it = bloquesList.iterator(); it.hasNext();) {
             BloqueHorario enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

@@ -52,10 +52,11 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
     public List<RespuestaComandoManual> getNewerThan(int lastID, long offset){
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
-            "SELECT r FROM RespuestaComandoManual r WHERE id > :lastID ORDER BY id ASC LIMIT :offset,100"
+            "SELECT r FROM RespuestaComandoManual r WHERE id > :lastID ORDER BY id ASC"
         )
-        .setParameter("lastID", lastID)
-        .setParameter("offset", offset);
+        .setFirstResult((int) offset)
+        .setMaxResults(100)
+        .setParameter("lastID", lastID);
         List<RespuestaComandoManual> outputResult;
         try {
             outputResult = (List<RespuestaComandoManual>) query.getResultList();
@@ -70,8 +71,6 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
         entityManager = PersistenceManager.INSTANCE.getEntityManager();
         entityManager.getTransaction().begin();
         entityManager.merge(r);
-        entityManager.flush();
-        entityManager.clear();
         entityManager.getTransaction().commit();
         entityManager.close();
     }

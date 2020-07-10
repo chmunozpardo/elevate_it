@@ -24,8 +24,6 @@ public class PuntosAccesos {
         for (Iterator<PuntoAcceso> it = reservasList.iterator(); it.hasNext();) {
             PuntoAcceso enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

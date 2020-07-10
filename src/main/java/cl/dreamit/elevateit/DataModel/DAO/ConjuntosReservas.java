@@ -23,8 +23,6 @@ public class ConjuntosReservas {
         for (Iterator<ConjuntoReserva> it = reservasList.iterator(); it.hasNext();) {
             ConjuntoReserva enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();

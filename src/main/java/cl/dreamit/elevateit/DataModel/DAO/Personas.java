@@ -23,8 +23,6 @@ public class Personas {
         for (Iterator<Persona> it = personasList.iterator(); it.hasNext();) {
             Persona enquiry = it.next();
             entityManager.merge(enquiry);
-            entityManager.flush();
-            entityManager.clear();
         }
         entityManager.getTransaction().commit();
         entityManager.close();
