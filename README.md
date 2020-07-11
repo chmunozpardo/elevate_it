@@ -1,9 +1,33 @@
-# **Por favor leer antes de usar**
+# **Instrucciones instalación**
+
+# Instalar `mariadb-server`
+
+Se debe instalar el servidor de bases de datos `mariadb` para almacenar la información recibida desde la API de GK2:
+
+```
+sudo apt install mariadb-server
+```
+
+Luego se debe habilitar el usuario `root` con clave de acceso `root`, para lo cual se usan los siguientes comandos:
+
+// TODO
+```
+TODO
+```
+
+Y finalmente crear la base de datos `elevate_it`:
+```
+mysql -uroot -p
+CREATE DATABASE elevate_it;
+```
+
+# Instalar `pi4j`
+
 Para el correcto funcionamiento en el Nanopi NEO Plus2, se debe instalar la librería de **pi4j**, la cual es necesaria para interactuar con los GPIOs del hardware, ya sea para el uso del I2C, Buzzer, Wiegand o RS422. Para esto es necesario compilar la librería, dado que la versión que se encuentra en la página oficial está compilada para una arquitectura distinta `arm32` que la del procesador del Nanopi usado aquí `arm64`.
 
 Para esto es necesario seguir los siguientes pasos, luego de acceder al Nanopi a través de `ssh`:
 
-# Instalar paquetes
+## Instalar paquetes
 
 Los paquetes a instalar son:
 - `openjdk8`: Es necesario tener la versión 8 del SDK abierto de Java, dado que la librería funciona sólo con esta versión
@@ -52,3 +76,17 @@ Luego de esto, la librería debería estar disponible para usar. Para confirmar 
 ```
 pi4j -v
 ```
+
+## Compilar esta librería
+
+Para esto hay que correr el siguiente comando desde la carpeta principal:
+
+```
+mvn compile
+```
+
+Para ejecutar el programa se debe usar:
+```
+java -jar elevate_it.jar
+```
+// TODO agregar maven assembly al pom.xml

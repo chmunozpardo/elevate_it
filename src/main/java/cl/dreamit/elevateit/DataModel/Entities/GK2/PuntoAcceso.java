@@ -102,7 +102,7 @@ public class PuntoAcceso {
     }
 
     public int validar(ResumenTarjetaControlador rtc) {
-        int permisoNecesario = 0b1 << numeroCanal;
+        int permisoNecesario = 1 << numeroCanal;
         if ((permisoNecesario & rtc.permisos) == 0) {
             //LOG.info(true,"Rechazo de Apertura. El Registro no cuenta con los privilegios suficientes para este Punto de Acceso");
             return Operation.PERMISSION_REFUSE;

@@ -3,7 +3,7 @@ JAVA_HOME:=${JAVA_HOME}
 INCLUDES:=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 
 C_SOURCES:=WiegandReader.c
-OUTPUT:=libwiegandreader.so
+OUTPUT:=/usr/lib/libwiegandreader.so
 FLAGS:=-fPIC
 WARNINGS:=-Wall
 

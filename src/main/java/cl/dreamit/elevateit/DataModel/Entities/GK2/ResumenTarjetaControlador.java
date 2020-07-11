@@ -44,7 +44,7 @@ public class ResumenTarjetaControlador {
     public int antipassbackStatus;
 
     public int validar(PuntoAcceso puntoValidacion) {
-        int permisoNecesario = 0b1 << puntoValidacion.numeroCanal;
+        int permisoNecesario = 1 << puntoValidacion.numeroCanal;
         if ((permisoNecesario & this.permisos) == 0) {
             //LOG.info(true,"Rechazo de Apertura. El Registro no cuenta con los privilegios suficientes para este Punto de Acceso");
             return Operation.PERMISSION_REFUSE;

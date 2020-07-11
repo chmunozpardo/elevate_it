@@ -9,7 +9,7 @@ import cl.dreamit.elevateit.DataModel.DataSincronizacionSubida;
 
 public class SyncMessage {
     public Long timestamp;
-    public List<DataSincronizacionSubida> uploadData = new ArrayList<>();
+    public List<DataSincronizacionSubida> uploadData = new ArrayList<DataSincronizacionSubida>();
 
     public SyncMessage(Long timestamp) {
         this.timestamp = timestamp;
