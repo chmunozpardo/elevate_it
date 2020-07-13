@@ -10,7 +10,6 @@ sudo apt install mariadb-server
 
 Luego se debe habilitar el usuario `admin` con clave de acceso `admin`, para lo cual se usan los siguientes comandos:
 
-// TODO
 ```
 CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
 GRANT ALL PRIVILEGES ON *.* TO 'admin'@'%' IDENTIFIED BY 'admin';
