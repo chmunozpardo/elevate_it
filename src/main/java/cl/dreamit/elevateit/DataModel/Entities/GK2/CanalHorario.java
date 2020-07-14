@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "canalHorario")
 public class CanalHorario {
     @Transient
     private static int DATA_BYTES = 84;
@@ -51,7 +50,7 @@ public class CanalHorario {
         Date ahora = new Date();
         String nombreDia = diasSemana[Util.getDiaSemana(ahora) - 1];
         String horaActual = new SimpleDateFormat("H:m").format(ahora);
-        List<BloqueHorario> bloquesValidos = BloquesCanalesHorarios.getByDiaHora(this.id, nombreDia, horaActual);
+        List<BloqueHorario> bloquesValidos = BloquesCanalesHorarios.INSTANCE.getByDiaHora(this.id, nombreDia, horaActual);
         return !bloquesValidos.isEmpty();
     }
 }

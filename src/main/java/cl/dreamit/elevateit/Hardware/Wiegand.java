@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.google.gson.Gson;
 
+import cl.dreamit.elevateit.Configuration.CONF;
 import cl.dreamit.elevateit.DataModel.Const.CardTypes;
 import cl.dreamit.elevateit.DataModel.Const.Operation;
 import cl.dreamit.elevateit.DataModel.Const.ReadSource;
@@ -57,12 +58,12 @@ public class Wiegand {  // Save as HelloJNI.java
 
     public void searchCard(){
 
-        Configuracion id_controlador = Configuraciones.getParametro("idDevice");
+        Configuracion id_controlador = Configuraciones.INSTANCE.getParametro("idDevice");
         int id = Integer.parseInt(id_controlador.valor);
-        Controlador controlador = Controladores.getByID(id);
+        Controlador controlador = Controladores.INSTANCE.getByID(id);
         int canal = 0;
 
-        PuntoAcceso puntoAcceso = PuntosAccesos.getPuntoAccesoControlador(controlador.id, canal);
+        PuntoAcceso puntoAcceso = PuntosAccesos.INSTANCE.getPuntoAccesoControlador(controlador.id, canal);
         String codigoAcceso =  this.card_1 + "-" + this.card_2;
 
         int validacionMedioAcceso = Operation.INVALID_OPEN;
@@ -76,7 +77,7 @@ public class Wiegand {  // Save as HelloJNI.java
         }
 
         //Primero buscamos si existe el codigo del medio de acceso como un ResumenTarjetaControlador.
-        ResumenTarjetaControlador rtc = (cardCodes != null) ? TarjetasAcceso.getTarjeta(this.cardType, cardCodes[0], cardCodes[1]) : null;
+        ResumenTarjetaControlador rtc = (cardCodes != null) ? TarjetasAcceso.INSTANCE.getTarjeta(this.cardType, cardCodes[0], cardCodes[1]) : null;
 
         //Permisos completos de la validacion por MedioAcceso o Reserva. Se sumaran los que correspondan segun la Reserva y su destino. Valido solo para control tipo ascensor.
         int permisosTotales = 0;
@@ -94,7 +95,7 @@ public class Wiegand {  // Save as HelloJNI.java
 
             //Validacion de canal horario. Solo lo aplicamos si cualquiera validacion anterior estaba 'permitiendo' el acceso. De lo contrario fue un rechazo por otro motivo. ergo. ya no es importante esta validacion.
             if (validacionMedioAcceso == Operation.VALID_OPEN) {
-                CanalHorario canalHorario = rtc.id_canal_horario != 0 ? CanalesHorarios.getById(rtc.id_canal_horario) : null;
+                CanalHorario canalHorario = rtc.id_canal_horario != 0 ? CanalesHorarios.INSTANCE.getById(rtc.id_canal_horario) : null;
 
                 if (canalHorario != null && !canalHorario.esValido()){
                     Log.error("El canal Horario no está en un horario válido");
@@ -109,7 +110,7 @@ public class Wiegand {  // Save as HelloJNI.java
         List<Reserva> reservas = new ArrayList<Reserva>();
 
         if (this.cardType == CardTypes.PERSON_ID){
-            persona = Personas.getByCredencial(TipoCredencial.CEDULA_IDENTIDAD, codigoAcceso);
+            persona = Personas.INSTANCE.getByCredencial(TipoCredencial.CEDULA_IDENTIDAD, codigoAcceso);
 
             if (persona != null)
                 {
@@ -117,13 +118,13 @@ public class Wiegand {  // Save as HelloJNI.java
                 reservas = persona.obtenerReservasValidas(fechaHoy);
                 }
             } else if (this.cardType == CardTypes.PASSPORT_ID) {
-            persona = Personas.getByCredencial(TipoCredencial.PASAPORTE, codigoAcceso);
+            persona = Personas.INSTANCE.getByCredencial(TipoCredencial.PASAPORTE, codigoAcceso);
             if (persona != null) {
                 //La persona efectivamente existe. debemos buscar Reservas para esta persona el dia de hoy.
                 reservas = persona.obtenerReservasValidas(fechaHoy);
             }
         } else if (this.cardType == CardTypes.RESERVATION_CODE) {
-            ConjuntoReserva conjuntoReserva = ConjuntosReservas.getConjuntoReservaCodigoReserva(codigoAcceso);
+            ConjuntoReserva conjuntoReserva = ConjuntosReservas.INSTANCE.getConjuntoReservaCodigoReserva(codigoAcceso);
             if (conjuntoReserva != null) {
                 reservas = conjuntoReserva.reservasAsociadasFecha(fechaHoy);
                 //Igualmente necesitaremos los datos de la persona vinculada a dicha reserva.
@@ -135,7 +136,7 @@ public class Wiegand {  // Save as HelloJNI.java
             //lectura codigo QR invitación
             String codigoQr[] = codigoAcceso.split("_");
             int idConjuntoReserva = Integer.parseInt(codigoQr[1]);
-            ConjuntoReserva conjuntoReserva = ConjuntosReservas.getByID(idConjuntoReserva);
+            ConjuntoReserva conjuntoReserva = ConjuntosReservas.INSTANCE.getByID(idConjuntoReserva);
             if (conjuntoReserva != null) {
                 reservas = conjuntoReserva.reservasAsociadasFecha(fechaHoy);
                 //Igualmente necesitaremos los datos de la persona vinculada a dicha reserva.
@@ -234,21 +235,23 @@ public class Wiegand {  // Save as HelloJNI.java
     }
 
     private static void notificarControladorBotonera(String ipControladoraBotonera, int permisosTotales) {
-        if (permisosTotales == 0 || permisosTotales > 255) {
+        if (permisosTotales == 0 || permisosTotales > ((1 << CONF.CANTIDAD_CANALES) - 1)) {
             Log.error("Permisos no validos: " + permisosTotales);
             return;
         }
         List<String> canalesPermitidos = new ArrayList<String>();
-        for (int i = 0; i < 8; i++) {
-            if ((permisosTotales & (0b1 << i)) != 0) {
-                canalesPermitidos.add(String.format("%d", i));
-            }
-        }
-        String comando = String.format("OUTPUT:OPEN:%s\r\n", String.join(",", canalesPermitidos));
-        System.out.println(comando);
+        List<Integer> canalesApertura = new ArrayList<Integer>();
         try {
             cl.dreamit.elevateit.Hardware.Relay rele = new cl.dreamit.elevateit.Hardware.Relay(0x20);
-            rele.openRelay(0);
+            for (int i = 0; i < 16; i++) {
+                if ((permisosTotales & (0b1 << i)) != 0) {
+                    canalesPermitidos.add(String.format("%d", i));
+                    canalesApertura.add(i);
+                    rele.openRelay(canalesApertura);
+                }
+            }
+            String comando = String.format("OUTPUT:OPEN:%s\r\n", String.join(",", canalesPermitidos));
+            System.out.println(comando);
         } catch(Exception ex){}
     }
 }

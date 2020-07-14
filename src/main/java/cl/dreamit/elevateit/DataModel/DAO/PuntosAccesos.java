@@ -12,25 +12,31 @@ import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class PuntosAccesos {
+public enum PuntosAccesos {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
+    @PersistenceContext(unitName="elevateIT")
+    private EntityManager entityManager;
 
-    public static void save(List<PuntoAcceso> puntos){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(List<PuntoAcceso> puntos){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<PuntoAcceso> reservasList = puntos;
-        entityManager.getTransaction().begin();
-        for (Iterator<PuntoAcceso> it = reservasList.iterator(); it.hasNext();) {
-            PuntoAcceso enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<PuntoAcceso> it = reservasList.iterator(); it.hasNext();) {
+                PuntoAcceso enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static PuntoAcceso getPuntoAccesoControlador(int id, int canal){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public PuntoAcceso getPuntoAccesoControlador(int id, int canal){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id AND numeroCanal = :canal"
         )
@@ -46,8 +52,8 @@ public class PuntosAccesos {
         return outputResult;
     }
 
-    public static List<PuntoAcceso> getPuntosAccesoControlador(int id){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<PuntoAcceso> getPuntosAccesoControlador(int id){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id"
         )

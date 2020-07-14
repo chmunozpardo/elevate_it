@@ -13,7 +13,6 @@ import java.util.List;
 
 @Entity
 @Table(
-    name = "conjuntoReserva",
     indexes = {
         @Index(
             name = "codigo_reserva",
@@ -42,9 +41,9 @@ public class ConjuntoReserva {
     public String tipo_sujeto;
     public int id_tipo_reserva;
     public int id_tipo_sujeto;
-    @Column(length=200)
+    @Column(length=100)
     public String fecha_inicio_index;
-    @Column(length=200)
+    @Column(length=100)
     public String fecha_fin_index;
     public String frecuencia;
     public String anfitrion;
@@ -52,15 +51,15 @@ public class ConjuntoReserva {
     public String QR;
     public String comentario;
 
-    @Column(length=200)
+    @Column(length=100)
     public String codigo_reserva;
     public String hash_validacion;
 
     public List<Reserva> reservasAsociadas(){
-        return Reservas.getReservasByIdConjuntoReserva(this.id);
+        return Reservas.INSTANCE.getReservasByIdConjuntoReserva(this.id);
     }
 
     public List<Reserva> reservasAsociadasFecha(String fecha){
-        return Reservas.getReservasByIdConjuntoReserva(this.id, fecha);
+        return Reservas.INSTANCE.getReservasByIdConjuntoReserva(this.id, fecha);
     }
 }

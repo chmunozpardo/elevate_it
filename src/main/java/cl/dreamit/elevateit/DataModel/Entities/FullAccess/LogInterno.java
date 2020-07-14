@@ -27,6 +27,6 @@ public class LogInterno {
     }
 
     public void save(){
-        LogsInternos.save(this);
+        LogsInternos.INSTANCE.save(this);
     }
 }

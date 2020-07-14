@@ -9,7 +9,6 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(
-    name = "comandoManual",
     indexes = {
         @Index(
             name = "id",

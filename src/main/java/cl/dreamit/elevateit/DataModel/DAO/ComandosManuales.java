@@ -10,20 +10,23 @@ import javax.persistence.PersistenceContext;
 import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.ComandoManual;
 
-public class ComandosManuales {
+public enum ComandosManuales {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(ComandoManual[] comandos){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        entityManager.getTransaction().begin();
+    public void save(ComandoManual[] comandos){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<ComandoManual> comandosList = Arrays.asList(comandos);
-        for (Iterator<ComandoManual> it = comandosList.iterator(); it.hasNext();) {
-            ComandoManual enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ComandoManual> it = comandosList.iterator(); it.hasNext();) {
+                ComandoManual enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 }

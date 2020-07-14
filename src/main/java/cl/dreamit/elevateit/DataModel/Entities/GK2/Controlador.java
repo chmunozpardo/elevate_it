@@ -12,7 +12,6 @@ import cl.dreamit.elevateit.DataModel.DAO.PuntosAccesos;
 import java.util.List;
 
 @Entity
-@Table(name = "controlador")
 public class Controlador {
     @Id
     //@GeneratedValue
@@ -37,7 +36,7 @@ public class Controlador {
      * @return
      */
     public PuntoAcceso obtenerPuntoAcceso(int canal){
-        return PuntosAccesos.getPuntoAccesoControlador(this.id, canal);
+        return PuntosAccesos.INSTANCE.getPuntoAccesoControlador(this.id, canal);
     }
 
     /**
@@ -47,7 +46,7 @@ public class Controlador {
      * @return
      */
     public String obtenerValorParametro(String parametro) {
-        ParametroControlador p = ParametrosControladores.getParametroControlador(this.id, parametro);
+        ParametroControlador p = ParametrosControladores.INSTANCE.getParametroControlador(this.id, parametro);
         if (p == null) {
             return null;
         }
@@ -55,7 +54,7 @@ public class Controlador {
     }
 
     public ParametroControlador obtenerParametro(String nombreParametro) {
-        return ParametrosControladores.getParametroControlador(this.id, nombreParametro);
+        return ParametrosControladores.INSTANCE.getParametroControlador(this.id, nombreParametro);
     }
 
     /**
@@ -66,7 +65,7 @@ public class Controlador {
         if (p != null) {
             p.valor = valor;
         }
-        ParametrosControladores.save(p);
+        ParametrosControladores.INSTANCE.save(p);
     }
 
     /**
@@ -80,6 +79,6 @@ public class Controlador {
     }
 
     public List<PuntoAcceso> obtenerPuntosAcceso() {
-        return PuntosAccesos.getPuntosAccesoControlador(this.id);
+        return PuntosAccesos.INSTANCE.getPuntosAccesoControlador(this.id);
     }
 }

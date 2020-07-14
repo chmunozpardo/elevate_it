@@ -38,8 +38,12 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.Reserva;
 import cl.dreamit.elevateit.Utils.HttpRequest;
 import cl.dreamit.elevateit.Utils.Log;
 import cl.dreamit.elevateit.Utils.NetworkUtil;
+import cl.dreamit.elevateit.Utils.PersistenceManager;
 import cl.dreamit.elevateit.Utils.Util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -47,6 +51,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.persistence.EntityManager;
 
 import com.google.gson.Gson;
 
@@ -63,18 +69,18 @@ public class Synchronizer implements Runnable {
     );
 
     public Synchronizer() {
-        apiToken = Configuraciones.getParametro("apitoken").valor;
-        targetDatabase = Configuraciones.getParametro("base_datos").valor;
-        apiURL = Configuraciones.getParametro("API_URL").valor;
+        apiToken = Configuraciones.INSTANCE.getParametro("apitoken").valor;
+        targetDatabase = Configuraciones.INSTANCE.getParametro("base_datos").valor;
+        apiURL = Configuraciones.INSTANCE.getParametro("API_URL").valor;
     }
 
     public void run() {
-        Configuracion timeStamp = Configuraciones.getParametro("lastSyncTimestamp");
+        Configuracion timeStamp = Configuraciones.INSTANCE.getParametro("lastSyncTimestamp");
         if(timeStamp == null){
             timeStamp = new Configuracion();
             timeStamp.parametro = "lastSyncTimestamp";
             timeStamp.valor = "0";
-            Configuraciones.save(timeStamp);
+            Configuraciones.INSTANCE.save(timeStamp);
         }
         lastSyncTimestamp = Long.parseLong(timeStamp.valor);
         while(true){
@@ -98,14 +104,14 @@ public class Synchronizer implements Runnable {
                 if (syncResponse.estado.equals("OK")) {
                     lastSyncTimestamp = syncResponse.currentTimestamp;
                     //actualizarFechaHora(syncResponse.localTime); //Descartado. Solo Apps a nivel de sistema pueden hacer esto.
-                    TarjetasAcceso.save(syncResponse.tarjetas);
+                    TarjetasAcceso.INSTANCE.save(syncResponse.tarjetas);
                     //TODO podría ser posible almacenar todo y filo; con un algoritmo de limpieza no debería ser problema el almacenamiento
                     almacenarReservas(syncResponse.reservas);
                     almacenarControlador(syncResponse.controlador);
                     almacenarCanalesHorarios(syncResponse.canalesHorarios);
                     //Los comandosManuales deben ser procesados. Pero en un hilo independiente.
-                    ProcesadorComandosManuales.procesarComandos(syncResponse.comandos);
-                    ComandosManuales.save(syncResponse.comandos); //Los Comandos manuales no tiene sentido almacenarlos; Solo procesarlos.
+                    ProcesadorComandosManuales.INSTANCE.procesarComandos(syncResponse.comandos);
+                    ComandosManuales.INSTANCE.save(syncResponse.comandos); //Los Comandos manuales no tiene sentido almacenarlos; Solo procesarlos.
                     //Cargamos los ultimos ID subidos en la tabla de configuracion.
                     actualizarUltimosID(ultimosID);
                 } else if (syncResponse.estado.equals("ERROR")) {
@@ -139,12 +145,12 @@ public class Synchronizer implements Runnable {
         parametrosRegistro.put("version", Double.toString(CONF.VERSION_FULL_ACCESS));
         parametrosRegistro.put("cantidadCanales", CONF.CANTIDAD_CANALES);
         parametrosRegistro.put("capturaHuellas", CONF.CAPTURA_HUELLAS);
-        Configuracion parametroApiURL = Configuraciones.getParametro("API_URL");
+        Configuracion parametroApiURL = Configuraciones.INSTANCE.getParametro("API_URL");
         if (parametroApiURL == null) {
             parametroApiURL = new Configuracion();
             parametroApiURL.parametro = "API_URL";
             parametroApiURL.valor = CONF.API_URL;
-            Configuraciones.save(parametroApiURL);
+            Configuraciones.INSTANCE.save(parametroApiURL);
         }
         HttpRequest request = new HttpRequest(parametroApiURL.valor + CONF.URL_REGISTER_DEVICE, parametrosRegistro);
         String respuesta = request.getResponse();
@@ -159,9 +165,9 @@ public class Synchronizer implements Runnable {
                     Log.error("Parámetros de respuesta incompletos");
                 } else {
                     //Registro OK. Copia los datos de registro en nuestra DB local.
-                    Configuraciones.save(new Configuracion(Parametro.API_TOKEN, respuestaGK.apitoken));
-                    Configuraciones.save(new Configuracion(Parametro.DATABASE, respuestaGK.base_datos));
-                    Configuraciones.save(new Configuracion(Parametro.DEVICE_ID, Long.toString(respuestaGK.idDevice)));
+                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.API_TOKEN, respuestaGK.apitoken));
+                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.DATABASE, respuestaGK.base_datos));
+                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.DEVICE_ID, Long.toString(respuestaGK.idDevice)));
                     Log.error("Registro de configuraciones correcto");
                     //Lanza el dialog successfull.
                 }
@@ -180,10 +186,10 @@ public class Synchronizer implements Runnable {
         if (canalesHorarios == null) {
             return;
         }
-        CanalesHorarios.save(canalesHorarios);
+        CanalesHorarios.INSTANCE.save(canalesHorarios);
         for (CanalHorario c : canalesHorarios) {
             if (c.bloques_horario_trashed != null) {
-                BloquesCanalesHorarios.save(c.bloques_horario_trashed);
+                BloquesCanalesHorarios.INSTANCE.save(c.bloques_horario_trashed);
             }
         }
     }
@@ -193,7 +199,7 @@ public class Synchronizer implements Runnable {
             return;
         }
         //Primero se almacenan los controladores.
-        Controladores.save(controlador);
+        Controladores.INSTANCE.save(controlador);
         //Luego guardamos las estructuras anidadas.
         List<ParametroControlador> parametrosControlador = new ArrayList<>();
         List<PuntoAcceso> puntosAccesos = new ArrayList<>();
@@ -211,9 +217,9 @@ public class Synchronizer implements Runnable {
                 }
             }
         }
-        PuntosAccesos.save(puntosAccesos);
-        ParametrosControladores.save(parametrosControlador);
-        ParametrosPuntosAccesos.save(parametrosPuntosAccesos);
+        PuntosAccesos.INSTANCE.save(puntosAccesos);
+        ParametrosControladores.INSTANCE.save(parametrosControlador);
+        ParametrosPuntosAccesos.INSTANCE.save(parametrosPuntosAccesos);
     }
 
     private void actualizarParametrosControlador(ParametroControlador[] parametros_controlador) {
@@ -257,7 +263,7 @@ public class Synchronizer implements Runnable {
 
     private void almacenarReservas(Reserva[] reservas) {
         //Primero almacenamos las reservas propiamente tal.
-        Reservas.save(reservas);
+        Reservas.INSTANCE.save(reservas);
 
         //Luego almacenamos los elementos anidados.
         List<ConjuntoReserva> conjuntosReservas = new ArrayList<>();
@@ -274,9 +280,9 @@ public class Synchronizer implements Runnable {
                 personas.add(r.persona);
             }
         }
-        ConjuntosReservas.save(conjuntosReservas);
-        Estacionamientos.save(estacionamientos);
-        Personas.save(personas);
+        ConjuntosReservas.INSTANCE.save(conjuntosReservas);
+        Estacionamientos.INSTANCE.save(estacionamientos);
+        Personas.INSTANCE.save(personas);
     }
 
     private void actualizarUltimosID(Map<String, Long> ultimosID) {
@@ -287,9 +293,9 @@ public class Synchronizer implements Runnable {
     }
 
     private int getLastUploadID(String tabla) {
-        Configuracion p = Configuraciones.getParametro(Parametro.LAST_UPLOAD_ID_PREFIX + tabla);
+        Configuracion p = Configuraciones.INSTANCE.getParametro(Parametro.LAST_UPLOAD_ID_PREFIX + tabla);
         if (p == null) {
-            Configuraciones.save(new Configuracion(Parametro.LAST_UPLOAD_ID_PREFIX + tabla, "0"));
+            Configuraciones.INSTANCE.save(new Configuracion(Parametro.LAST_UPLOAD_ID_PREFIX + tabla, "0"));
             return 0;
         } else {
             return Integer.parseInt(p.valor);
@@ -298,13 +304,61 @@ public class Synchronizer implements Runnable {
 
     private void setLastUploadID(String tabla, Long id) {
         //Verifica si existe dicho valor, se antepone el string "lastUploadID_" al nombre de la tabla.
-        Configuracion p = Configuraciones.getParametro(Parametro.LAST_UPLOAD_ID_PREFIX + tabla);
+        Configuracion p = Configuraciones.INSTANCE.getParametro(Parametro.LAST_UPLOAD_ID_PREFIX + tabla);
         if (p == null) {
-            Configuraciones.save(new Configuracion(Parametro.LAST_UPLOAD_ID_PREFIX + tabla, String.format(Locale.US, "%d", id)));
+            Configuraciones.INSTANCE.save(new Configuracion(Parametro.LAST_UPLOAD_ID_PREFIX + tabla, String.format(Locale.US, "%d", id)));
         } else {
             // Parámetro ya existe. Actualízalo.
             p.valor = String.format(Locale.US, "%d", id);
-            Configuraciones.save(p);
+            Configuraciones.INSTANCE.save(p);
         }
+    }
+
+    public static void cleanTables(){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        List<String> tableEntities = Arrays.asList(
+            "Configuracion",
+            "LogInterno",
+            "ReservaValidada",
+            "BloqueHorario",
+            "CanalHorario",
+            "ComandoManual",
+            "ConjuntoReserva",
+            "Controlador",
+            "Estacionamiento",
+            "LogAcceso",
+            "MedioAcceso",
+            "ParametroControlador",
+            "ParametroPuntoAcceso",
+            "Persona",
+            "PuntoAcceso",
+            "Reserva",
+            "RespuestaComandoManual",
+            "ResumenTarjetaControlador"
+        );
+        entityManager.getTransaction().begin();
+        for(String table: tableEntities){
+            String query = "TRUNCATE TABLE " + table;
+            System.out.println(query);
+            entityManager.createNativeQuery(query)
+                         .executeUpdate();
+        }
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
+    public static void main(String[] args) {
+        BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Enter a registration code:");
+        try {
+            String codeNumber = obj.readLine();
+            System.out.print("Registering with code: " + codeNumber);
+            cleanTables();
+            Synchronizer.registrarDispositivo(codeNumber);
+        }
+        catch (IOException e){
+            System.out.println("Error reading from user");
+        }
+        System.exit(0);
     }
 }

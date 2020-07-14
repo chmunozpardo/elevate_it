@@ -12,7 +12,6 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
-@Table(name = "reserva_validada")
 public class ReservaValidada extends UploadableEntity {
     @Id
     @GeneratedValue

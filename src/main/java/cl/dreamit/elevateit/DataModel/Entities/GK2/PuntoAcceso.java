@@ -14,7 +14,6 @@ import javax.persistence.Transient;
 import com.google.gson.Gson;
 
 @Entity
-@Table(name = "puntoAcceso")
 public class PuntoAcceso {
     @Id
     //@GeneratedValue
@@ -32,7 +31,7 @@ public class PuntoAcceso {
     public ParametroPuntoAcceso[] parametros_punto_acceso;
 
     public boolean esEntrada() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "sentido");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "sentido");
         if (p == null) {
             return false;
         }
@@ -41,7 +40,7 @@ public class PuntoAcceso {
     }
 
     public double temperaturaMinima() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id,"minTemp");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id,"minTemp");
         double outTemp;
 
         if(p!= null){
@@ -54,7 +53,7 @@ public class PuntoAcceso {
     }
 
     public double temperaturaMaxima() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id,"maxTemp");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id,"maxTemp");
         double outTemp;
         if(p!= null){
             String readTempValor = p.valor_override != null ? p.valor_override : p.valor;
@@ -66,7 +65,7 @@ public class PuntoAcceso {
     }
 
     public boolean esSalida() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "sentido");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "sentido");
         if (p == null) {
             return false;
         }
@@ -75,7 +74,7 @@ public class PuntoAcceso {
     }
 
     public boolean antipassbackHabilitado() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "antiPassback");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "antiPassback");
         if (p == null) {
             return false;
         }
@@ -89,7 +88,7 @@ public class PuntoAcceso {
      * @return tiempo
      */
     public int tiempoApertura() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "tiempoApertura");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "tiempoApertura");
         if (p == null) {
             return CONF.DEFAULT_OPEN_TIME;
         }
@@ -147,17 +146,17 @@ public class PuntoAcceso {
     }
 
     private boolean validaReservas() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "validacionReservas");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "validacionReservas");
         return p != null && "1".equals(p.valor_override);
     }
 
     private boolean esAccesoVehicular() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "accesoVehicular");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "accesoVehicular");
         return p != null && "1".equals(p.valor_override);
     }
 
     private boolean esEspacioComun() {
-        ParametroPuntoAcceso p = ParametrosPuntosAccesos.getParametroPuntoAcceso(this.id, "espacioComun");
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "espacioComun");
         return p != null && "1".equals(p.valor_override); }
 
     @Override

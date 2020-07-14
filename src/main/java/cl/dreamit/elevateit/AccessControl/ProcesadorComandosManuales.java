@@ -17,11 +17,12 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.RespuestaComandoManual;
 import cl.dreamit.elevateit.Utils.Log;
 import cl.dreamit.elevateit.Utils.Util;
 
-public class ProcesadorComandosManuales {
+public enum ProcesadorComandosManuales {
+    INSTANCE;
 
     public final static String COMANDO_OPEN = "OUTPUT:OPEN:";
 
-    public static void procesarComandos(ComandoManual[] comandos) {
+    public void procesarComandos(ComandoManual[] comandos) {
         for (ComandoManual comandoManual : comandos) {
             Log.error("Procesando Comando Manual: " + comandoManual);
             if (comandoManual.comando.startsWith(COMANDO_OPEN)) {
@@ -30,12 +31,12 @@ public class ProcesadorComandosManuales {
         }
     }
 
-    private static void procesar_comando_open(ComandoManual comandoManual) {
+    private void procesar_comando_open(ComandoManual comandoManual) {
         Log.error("Solicitud de apertura desde sistema GK");
         try {
             //Almacenamos el Log. Para ello necesitamos primero el Controlador.
-            Configuracion idControlador = Configuraciones.getParametro("idDevice");
-            Controlador controlador = Controladores.getByID(Integer.parseInt(idControlador.valor));
+            Configuracion idControlador = Configuraciones.INSTANCE.getParametro("idDevice");
+            Controlador controlador = Controladores.INSTANCE.getByID(Integer.parseInt(idControlador.valor));
             if (controlador == null) {
                 return;
             }

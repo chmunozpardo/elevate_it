@@ -3,6 +3,7 @@ package cl.dreamit.elevateit.Hardware;
 import java.io.IOException;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.pi4j.io.i2c.I2CBus;
@@ -32,22 +33,54 @@ public class Relay {
     public Relay(int controllerAddress) throws IOException, UnsupportedBusNumberException {
         busI2C = I2CFactory.getInstance(I2CBus.BUS_0);
         deviceI2C = busI2C.getDevice(controllerAddress);
-        responseI2C = deviceI2C.read((byte) 0x06);
-        System.out.println("Valor de configuración puerto 0 = " + responseI2C);
-        responseI2C = deviceI2C.read((byte) 0x07);
-        System.out.println("Valor de configuración puerto 1 = " + responseI2C);
-        for(Map.Entry<Integer, String> entry : commandsPCA9555.entrySet()){
-            System.out.println(String.format("Comando %d = %s", entry.getKey(), entry.getValue()));
-        }
+        deviceI2C.write(0x02, (byte)0x00);
+        deviceI2C.write(0x03, (byte)0x00);
+        deviceI2C.write(0x06, (byte)0x00);
+        deviceI2C.write(0x07, (byte)0x00);
     }
 
     public void openRelay(int puntoAcceso) {
         new Thread(() -> {
             try{
-                deviceI2C.write(0x06, (byte)0x00);
-                deviceI2C.write(0x02, (byte)(0x01 << puntoAcceso));
+                int addr = 0;
+                if(puntoAcceso < 8){
+                    addr = 0x02;
+                } else if(puntoAcceso >= 8){
+                    addr = 0x03;
+                }
+                int read_data = deviceI2C.read(addr);
+                read_data |= (0x01 << (puntoAcceso % 8));
+                deviceI2C.write(addr, (byte)read_data);
                 Thread.sleep(CONF.DEFAULT_OPEN_TIME);
-                deviceI2C.write(0x02, (byte)0x00);
+                read_data = deviceI2C.read(addr);
+                read_data &= ~(0x01 << (puntoAcceso % 8));
+                deviceI2C.write(addr, (byte)read_data);
+            } catch(Exception ignored) {}
+        }).start();
+    }
+
+    public void openRelay(List<Integer> puntosAcceso) {
+        new Thread(() -> {
+            try{
+                int writeData = 0;
+                for(Integer puntoAcceso : puntosAcceso){
+                    writeData |= (0x01 << puntoAcceso);
+                }
+                int lowerData = writeData & (0xFF);
+                int upperData = (writeData >> 8) & (0xFF);
+                int readLowerData = deviceI2C.read(0x02);
+                int readUpperData = deviceI2C.read(0x03);
+                readLowerData |= lowerData;
+                readUpperData |= upperData;
+                deviceI2C.write(0x02, (byte)readLowerData);
+                deviceI2C.write(0x03, (byte)readUpperData);
+                Thread.sleep(CONF.DEFAULT_OPEN_TIME);
+                readLowerData = deviceI2C.read(0x02);
+                readLowerData &= ~lowerData;
+                deviceI2C.write(0x02, (byte)readLowerData);
+                readUpperData = deviceI2C.read(0x03);
+                readUpperData &= ~upperData;
+                deviceI2C.write(0x03, (byte)readUpperData);
             } catch(Exception ignored) {}
         }).start();
     }

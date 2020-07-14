@@ -11,25 +11,28 @@ import javax.persistence.Query;
 import java.util.Iterator;
 import java.util.List;
 
-public class ConjuntosReservas {
+public enum ConjuntosReservas {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(List<ConjuntoReserva> conjuntosReservas){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(List<ConjuntoReserva> conjuntosReservas){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<ConjuntoReserva> reservasList = conjuntosReservas;
-        entityManager.getTransaction().begin();
-        for (Iterator<ConjuntoReserva> it = reservasList.iterator(); it.hasNext();) {
-            ConjuntoReserva enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ConjuntoReserva> it = reservasList.iterator(); it.hasNext();) {
+                ConjuntoReserva enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static ConjuntoReserva getByID(int id_conjunto_reserva){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public ConjuntoReserva getByID(int id_conjunto_reserva){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT c FROM ConjuntoReserva c " +
             "WHERE id = :id_conjunto_reserva"
@@ -45,8 +48,8 @@ public class ConjuntosReservas {
         return outputResult;
     }
 
-    public static ConjuntoReserva getConjuntoReservaCodigoReserva(String codigoAcceso){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public ConjuntoReserva getConjuntoReservaCodigoReserva(String codigoAcceso){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT c FROM ConjuntoReserva c " +
             "WHERE codigo_reserva LIKE :codigoAcceso"

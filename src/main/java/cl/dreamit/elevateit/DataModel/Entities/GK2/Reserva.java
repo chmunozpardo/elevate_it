@@ -15,7 +15,6 @@ import cl.dreamit.elevateit.DataModel.DAO.Personas;
 
 @Entity
 @Table(
-    name = "reserva",
     indexes = {
         @Index(
             name = "id_persona_reservada",
@@ -46,9 +45,9 @@ public class Reserva {
     public int id_proveedor;
     public int id_colaborador;
     public int id_estacionamiento;
-    @Column(length=200)
+    @Column(length=100)
     public String fecha_inicio;
-    @Column(length=200)
+    @Column(length=100)
     public String fecha_fin;
     public String hora_inicio;
     public String hora_fin;
@@ -118,14 +117,14 @@ public class Reserva {
      * @return
      */
     public Persona getPersonaReservada() {
-        return Personas.getById(this.id_persona_reservada);
+        return Personas.INSTANCE.getById(this.id_persona_reservada);
     }
 
     public ConjuntoReserva getConjuntoReserva() {
-        return ConjuntosReservas.getByID(this.id_conjunto_reserva);
+        return ConjuntosReservas.INSTANCE.getByID(this.id_conjunto_reserva);
     }
 
     public Estacionamiento getEstacionamiento() {
-        return Estacionamientos.getByID(this.id_estacionamiento);
+        return Estacionamientos.INSTANCE.getByID(this.id_estacionamiento);
     }
 }

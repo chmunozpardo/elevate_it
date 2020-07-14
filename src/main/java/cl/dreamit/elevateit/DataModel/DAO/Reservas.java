@@ -13,25 +13,28 @@ import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class Reservas {
+public enum Reservas {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(Reserva[] reservas){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(Reserva[] reservas){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<Reserva> reservasList = Arrays.asList(reservas);
-        entityManager.getTransaction().begin();
-        for (Iterator<Reserva> it = reservasList.iterator(); it.hasNext();) {
-            Reserva enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<Reserva> it = reservasList.iterator(); it.hasNext();) {
+                Reserva enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static List<Reserva> getAll(){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<Reserva> getAll(){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM Reserva r"
         );
@@ -45,8 +48,8 @@ public class Reservas {
         return outputResult;
     }
 
-    public static List<Reserva> getReservasValidasFecha(String fechaValidez) {
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<Reserva> getReservasValidasFecha(String fechaValidez) {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM Reserva r " +
             "WHERE fecha_inicio <= :fechaValidez " +
@@ -64,8 +67,8 @@ public class Reservas {
         return outputResult;
     }
 
-    public static List<Reserva> getReservasPersonaFecha(int id_persona, String fechaValidez){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<Reserva> getReservasPersonaFecha(int id_persona, String fechaValidez){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM Reserva r " +
             "WHERE fecha_inicio_index <= :fechaValidez " +
@@ -84,8 +87,8 @@ public class Reservas {
         return outputResult;
     }
 
-    public static List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva) {
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva) {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM Reserva r " +
             "WHERE id_conjunto_reserva = :idConjuntoReserva"
@@ -101,8 +104,8 @@ public class Reservas {
         return outputResult;
     }
 
-    public static List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva, String fechaValidez){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<Reserva> getReservasByIdConjuntoReserva(int idConjuntoReserva, String fechaValidez){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM Reserva r " +
             "WHERE id_conjunto_reserva = :idConjuntoReserva " +

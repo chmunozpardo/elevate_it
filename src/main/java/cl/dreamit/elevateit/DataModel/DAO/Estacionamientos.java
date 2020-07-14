@@ -11,24 +11,28 @@ import javax.persistence.Query;
 import java.util.Iterator;
 import java.util.List;
 
-public class Estacionamientos {
+public enum Estacionamientos {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(List<Estacionamiento> estacionamientos){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(List<Estacionamiento> estacionamientos){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<Estacionamiento> reservasList = estacionamientos;
-        entityManager.getTransaction().begin();
-        for (Iterator<Estacionamiento> it = reservasList.iterator(); it.hasNext();) {
-            Estacionamiento enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<Estacionamiento> it = reservasList.iterator(); it.hasNext();) {
+                Estacionamiento enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static Estacionamiento getByID(int id_estacionamiento){
+    public Estacionamiento getByID(int id_estacionamiento){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT e FROM Estacionamiento e WHERE id = :id_estacionamiento"
         )

@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat;
 
 @Entity
 @Table(
-    name = "registros_acceso",
     indexes = {
         @Index(
             name = "id",
@@ -24,7 +23,7 @@ import java.text.SimpleDateFormat;
 )
 public class LogAcceso extends UploadableEntity {
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     public int id;
     public int id_controlador;
     public int id_punto_acceso;

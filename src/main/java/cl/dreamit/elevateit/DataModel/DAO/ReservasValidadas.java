@@ -14,19 +14,21 @@ import java.util.List;
 public enum ReservasValidadas implements UploadableDAO<ReservaValidada>{
     INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
     public void save(ReservaValidada r){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.persist(r);
-        entityManager.getTransaction().commit();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(r);
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
+        }
         entityManager.close();
     }
 
     public List<ReservaValidada> getNewerThan(int lastID){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM ReservaValidada r WHERE id > :lastID ORDER BY id ASC"
         )

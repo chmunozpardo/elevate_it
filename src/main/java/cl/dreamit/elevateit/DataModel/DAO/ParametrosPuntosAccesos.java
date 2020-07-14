@@ -11,25 +11,28 @@ import javax.persistence.Query;
 import java.util.Iterator;
 import java.util.List;
 
-public class ParametrosPuntosAccesos {
+public enum ParametrosPuntosAccesos {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(List<ParametroPuntoAcceso> parametrosPuntosAccesos){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(List<ParametroPuntoAcceso> parametrosPuntosAccesos){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<ParametroPuntoAcceso> parametrosPuntosAccesosList = parametrosPuntosAccesos;
-        entityManager.getTransaction().begin();
-        for (Iterator<ParametroPuntoAcceso> it = parametrosPuntosAccesosList.iterator(); it.hasNext();) {
-            ParametroPuntoAcceso enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ParametroPuntoAcceso> it = parametrosPuntosAccesosList.iterator(); it.hasNext();) {
+                ParametroPuntoAcceso enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static ParametroPuntoAcceso getParametroPuntoAcceso(int idPuntoAcceso, String nombreParametro){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public ParametroPuntoAcceso getParametroPuntoAcceso(int idPuntoAcceso, String nombreParametro){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT p FROM ParametroPuntoAcceso p WHERE id_punto_acceso = :idPuntoAcceso AND parametro LIKE :nombreParametro"
         )

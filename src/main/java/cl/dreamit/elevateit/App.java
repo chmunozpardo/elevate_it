@@ -17,8 +17,6 @@ public final class App{
 
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
 
-        // Synchronizer.registrarDispositivo("294969");
-
         Thread sync = new Thread(new Synchronizer());
         sync.start();
 

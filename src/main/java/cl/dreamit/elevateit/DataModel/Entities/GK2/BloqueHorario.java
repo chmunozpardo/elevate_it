@@ -11,7 +11,6 @@ import com.google.gson.Gson;
 
 @Entity
 @Table(
-    name = "bloqueHorario",
     indexes = {
         @Index(
             name = "id_canal_horario",
@@ -28,7 +27,7 @@ public class BloqueHorario {
     //@GeneratedValue
     public Integer id;
     public Integer id_canal_horario;
-    @Column(length=200)
+    @Column(length=100)
     public String dia;
     public String inicio;
     public String fin;

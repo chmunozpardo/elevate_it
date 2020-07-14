@@ -7,16 +7,19 @@ import cl.dreamit.elevateit.Utils.PersistenceManager;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-public class LogsInternos {
+public enum LogsInternos {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(LogInterno log){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.persist(log);
-        entityManager.getTransaction().commit();
+    public void save(LogInterno log){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(log);
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
+        }
         entityManager.close();
     }
 }

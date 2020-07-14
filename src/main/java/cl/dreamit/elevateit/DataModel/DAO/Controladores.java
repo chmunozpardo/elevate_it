@@ -12,45 +12,58 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class Controladores {
+public enum Controladores {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(List<Controlador> controladores){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(List<Controlador> controladores){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<Controlador> controladoresList = controladores;
-        entityManager.getTransaction().begin();
-        for (Iterator<Controlador> it = controladoresList.iterator(); it.hasNext();) {
-            Controlador enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<Controlador> it = controladoresList.iterator(); it.hasNext();) {
+                Controlador enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static void save(Controlador controlador){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.merge(controlador);
-        entityManager.getTransaction().commit();
+    public void save(Controlador controlador){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(controlador);
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
+        }
         entityManager.close();
     }
 
-    public static void save(Controlador[] controladores){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(Controlador[] controladores){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<Controlador> controladoresList = Arrays.asList(controladores);
-        entityManager.getTransaction().begin();
-        for (Iterator<Controlador> it = controladoresList.iterator(); it.hasNext();) {
-            Controlador enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<Controlador> it = controladoresList.iterator(); it.hasNext();) {
+                Controlador enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static Controlador getByID(int id){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public Controlador getByID(int id){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT c FROM Controlador c WHERE id = :id"
         )

@@ -13,7 +13,6 @@ import com.google.gson.Gson;
 
 @Entity
 @Table(
-    name = "resumenTarjetaControlador",
     indexes = {
         @Index(
             name = "card_type",

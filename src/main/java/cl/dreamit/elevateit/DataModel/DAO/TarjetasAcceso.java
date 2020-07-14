@@ -12,30 +12,31 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class TarjetasAcceso {
+public enum TarjetasAcceso {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(ResumenTarjetaControlador rtc){
+    public void save(ResumenTarjetaControlador rtc){
 
     }
-
-    public static void save(ResumenTarjetaControlador[] rtc){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(ResumenTarjetaControlador[] rtc){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<ResumenTarjetaControlador> rtcList = Arrays.asList(rtc);
-        entityManager.getTransaction().begin();
-        for (Iterator<ResumenTarjetaControlador> it = rtcList.iterator(); it.hasNext();) {
-            ResumenTarjetaControlador enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ResumenTarjetaControlador> it = rtcList.iterator(); it.hasNext();) {
+                ResumenTarjetaControlador enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-
-    public static ResumenTarjetaControlador getTarjeta(int cardType, long card_code_1, long card_code_2){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public ResumenTarjetaControlador getTarjeta(int cardType, long card_code_1, long card_code_2){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM ResumenTarjetaControlador r WHERE card_type = :cardType AND card_code_1 = :card_code_1 AND card_code_2 = :card_code_2 ORDER BY id DESC"
         )
@@ -53,7 +54,7 @@ public class TarjetasAcceso {
         return outputResult;
     }
 
-    public static void eliminar(ResumenTarjetaControlador rtc){
+    public void eliminar(ResumenTarjetaControlador rtc){
 
     }
 }

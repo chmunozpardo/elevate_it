@@ -11,13 +11,11 @@ import javax.persistence.Query;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class Configuraciones {
+public enum Configuraciones {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static List<Configuracion> getAll(){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<Configuracion> getAll(){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT c FROM Configuracion c"
         );
@@ -31,8 +29,8 @@ public class Configuraciones {
         return outConfiguracion;
     }
 
-    public static Configuracion getParametro(String parametro){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public Configuracion getParametro(String parametro){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT c FROM Configuracion c WHERE parametro LIKE :parametro"
         )
@@ -47,11 +45,16 @@ public class Configuraciones {
         return outConfiguracion;
     }
 
-    public static void save(Configuracion p){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.merge(p);
-        entityManager.getTransaction().commit();
+    public void save(Configuracion p){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(p);
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
+        }
         entityManager.close();
     }
 }

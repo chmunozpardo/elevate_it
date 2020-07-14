@@ -11,7 +11,6 @@ import javax.persistence.Table;
 
 @Entity
 @Table(
-    name = "respuestaComandoManual",
     indexes = {
         @Index(
             name = "id",

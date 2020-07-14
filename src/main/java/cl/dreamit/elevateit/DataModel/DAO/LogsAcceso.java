@@ -14,11 +14,8 @@ import java.util.List;
 public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     INSTANCE;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
     public List<LogAcceso> getAll(){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM LogAcceso r"
         );
@@ -33,7 +30,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     }
 
     public List<LogAcceso> getNewerThan(int lastID){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
         )
@@ -50,7 +47,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     }
 
     public List<LogAcceso> getNewerThan(long lastID, long offset){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
         )
@@ -68,10 +65,15 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     }
 
     public void save(LogAcceso acceso){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        entityManager.getTransaction().begin();
-        entityManager.merge(acceso);
-        entityManager.getTransaction().commit();
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(acceso);
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
+        }
         entityManager.close();
     }
 

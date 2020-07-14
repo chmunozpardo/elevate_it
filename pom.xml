@@ -112,22 +112,49 @@
         <dependency>
           <groupId>com.pi4j</groupId>
           <artifactId>pi4j-core</artifactId>
-          <version>1.2-SNAPSHOT</version>
+          <version>1.3-SNAPSHOT</version>
         </dependency>
       </dependencies>
       <build>
         <plugins>
           <plugin>
-              <groupId>org.codehaus.mojo</groupId>
-              <artifactId>exec-maven-plugin</artifactId>
-              <version>${exec-maven-plugin.version}</version>
-              <configuration>
-                <executable>java</executable>
-                <mainClass>cl.dreamit.elevateit.App</mainClass>
-              </configuration>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${exec-maven-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>make</id>
+                <phase>compile</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <workingDirectory>src/main/c</workingDirectory>
+                  <executable>make</executable>
+                </configuration>
+              </execution>
+              <execution>
+                <id>main</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <configuration>
+                  <mainClass>cl.dreamit.elevateit.App</mainClass>
+                </configuration>
+              </execution>
+              <execution>
+                <id>sync</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <configuration>
+                  <mainClass>cl.dreamit.elevateit.Synchronizer.Synchronizer</mainClass>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
           <plugin>
-            <!-- Build an executable JAR -->
+            <!-- Build a JAR -->
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
             <version>${maven-jar-plugin.version}</version>
@@ -144,9 +171,6 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
             <version>${maven-compiler-plugin.version}</version>
-            <configuration>
-              <useIncrementalCompilation>false</useIncrementalCompilation>
-            </configuration>
           </plugin>
         </plugins>
       </build>

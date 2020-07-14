@@ -13,25 +13,28 @@ import java.util.Iterator;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class BloquesCanalesHorarios {
+public enum BloquesCanalesHorarios {
+    INSTANCE;
 
-    @PersistenceContext
-    private static EntityManager entityManager;
-
-    public static void save(BloqueHorario[] bloques){
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public void save(BloqueHorario[] bloques){
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         List<BloqueHorario> bloquesList = Arrays.asList(bloques);
-        entityManager.getTransaction().begin();
-        for (Iterator<BloqueHorario> it = bloquesList.iterator(); it.hasNext();) {
-            BloqueHorario enquiry = it.next();
-            entityManager.merge(enquiry);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<BloqueHorario> it = bloquesList.iterator(); it.hasNext();) {
+                BloqueHorario enquiry = it.next();
+                entityManager.merge(enquiry);
+            }
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
-        entityManager.getTransaction().commit();
         entityManager.close();
     }
 
-    public static List<BloqueHorario> getByDiaHora(int id_canal_horario, String nombreDia, String horaActual) {
-        entityManager = PersistenceManager.INSTANCE.getEntityManager();
+    public List<BloqueHorario> getByDiaHora(int id_canal_horario, String nombreDia, String horaActual) {
+        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
         Query query = entityManager.createQuery(
             "SELECT b FROM BloqueHorario b " +
             "WHERE id_canal_horario = :id_canal_horario " +
