@@ -8,7 +8,7 @@ Se debe instalar el servidor de bases de datos `mariadb` para almacenar la infor
 sudo apt install mariadb-server
 ```
 
-Luego se debe habilitar el usuario `admin` con clave de acceso `admin`, para lo cual se usan los siguientes comandos:
+Luego se debe habilitar el usuario `admin` con clave de acceso `admin`, para lo cual se usan los siguientes comandos usando `mysql`:
 
 ```
 CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
@@ -18,7 +18,7 @@ FLUSH PRIVILEGES;
 
 Y finalmente crear la base de datos `elevate_it`:
 ```
-mysql -uroot -p
+mysql -u admin -p
 CREATE DATABASE elevate_it;
 ```
 
@@ -59,7 +59,7 @@ export MAVEN_HOME=/opt/maven
 export PATH=${M2_HOME}/bin:${PATH}
 ```
 
-Con esto podemos compilar la librería usando la siguiente lista de comandos:
+Antes de seguir se debe reiniciar para que estas variables puedan ser cargadas o se pueden cargar manualmente copiándolas y pegándolas en consola. Con esto podemos compilar la librería usando la siguiente lista de comandos:
 
 ```
 cd ~
@@ -78,7 +78,7 @@ Luego de esto, la librería debería estar disponible para usar. Para confirmar 
 pi4j -v
 ```
 
-## Compilar esta librería
+## Compilar y correr esta librería
 
 Para esto hay que correr el siguiente comando desde la carpeta principal:
 
@@ -86,8 +86,13 @@ Para esto hay que correr el siguiente comando desde la carpeta principal:
 mvn compile
 ```
 
-Para ejecutar el programa se debe usar:
+Para realizar una sincronización, se debe usar:
+
 ```
-java -jar elevate_it.jar
+mvn exec:java@sync
 ```
-// TODO agregar maven assembly al pom.xml
+
+Al momento de sincronizar se limpiarán las tablas si es que ya hay datos existentes. Para ejecutar el programa principal, se debe usar:
+```
+mvn exec:exec@main
+```
