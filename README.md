@@ -8,7 +8,7 @@ Se debe instalar el servidor de bases de datos `mariadb` para almacenar la infor
 sudo apt install mariadb-server
 ```
 
-Luego se debe habilitar el usuario `admin` con clave de acceso `admin`, para lo cual se usan los siguientes comandos usando `mysql -u root`:
+Luego se debe habilitar el usuario `admin` con clave de acceso `admin`, para lo cual se usan los siguientes comandos usando `mysql`:
 
 ```
 CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
