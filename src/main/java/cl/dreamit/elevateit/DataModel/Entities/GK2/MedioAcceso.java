@@ -3,9 +3,7 @@ package cl.dreamit.elevateit.DataModel.Entities.GK2;
 import cl.dreamit.elevateit.DataModel.Const.CardTypes;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 @Entity
 public class MedioAcceso {

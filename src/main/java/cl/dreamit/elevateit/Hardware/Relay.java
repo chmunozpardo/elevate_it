@@ -2,16 +2,16 @@ package cl.dreamit.elevateit.Hardware;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+// import java.util.Map;
+// import java.util.HashMap;
 
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 
 import cl.dreamit.elevateit.Configuration.CONF;
-@SuppressWarnings("serial")
+//@SuppressWarnings("serial")
 public enum Relay {
     INSTANCE;
 
@@ -19,16 +19,16 @@ public enum Relay {
     private List<I2CDevice> devicesI2C = new ArrayList<I2CDevice>();;
     private List<Integer> accessPoints = new ArrayList<Integer>();
 
-    private Map<Integer, String> commandsPCA9555 = new HashMap<Integer, String>() {{
-        put(0, "Input port 0");
-        put(1, "Input port 1");
-        put(2, "Output port 0");
-        put(3, "Output port 1");
-        put(4, "Polarity inversion port 0");
-        put(5, "Polarity inversion port 1");
-        put(6, "Configuration port 0");
-        put(7, "Configuration port 1");
-    }};
+    // private Map<Integer, String> commandsPCA9555 = new HashMap<Integer, String>() {{
+    //     put(0, "Input port 0");
+    //     put(1, "Input port 1");
+    //     put(2, "Output port 0");
+    //     put(3, "Output port 1");
+    //     put(4, "Polarity inversion port 0");
+    //     put(5, "Polarity inversion port 1");
+    //     put(6, "Configuration port 0");
+    //     put(7, "Configuration port 1");
+    // }};
 
     private Relay() {
         try{

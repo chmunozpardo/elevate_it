@@ -1,9 +1,7 @@
 package cl.dreamit.elevateit.DataModel.Entities.GK2;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 import cl.dreamit.elevateit.DataModel.DAO.Reservas;
 

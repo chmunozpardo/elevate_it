@@ -6,9 +6,7 @@ import cl.dreamit.elevateit.DataModel.Const.Operation;
 import cl.dreamit.elevateit.DataModel.DAO.ParametrosPuntosAccesos;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import com.google.gson.Gson;

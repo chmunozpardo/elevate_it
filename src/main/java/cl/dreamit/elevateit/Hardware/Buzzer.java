@@ -1,33 +1,10 @@
 package cl.dreamit.elevateit.Hardware;
 
-import com.pi4j.io.i2c.I2CBus;
-import com.pi4j.io.i2c.I2CDevice;
-import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.NanoPiGpioProvider;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import com.pi4j.io.gpio.BananaProGpioProvider;
-import com.pi4j.io.gpio.BananaProPin;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiGpioProvider;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.platform.Platform;
-import com.pi4j.platform.PlatformAlreadyAssignedException;
-import com.pi4j.platform.PlatformManager;
-import com.pi4j.io.gpio.NanoPiPin;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinProvider;
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
-import com.pi4j.platform.PlatformAlreadyAssignedException;
-
 @SuppressWarnings("serial")
-public class Buzzer extends PinProvider{
+public class Buzzer {
 
     static {
         System.loadLibrary("elevateit");
@@ -63,7 +40,7 @@ public class Buzzer extends PinProvider{
 
     public static native void buzz(double frequency, int duration);
 
-    public static void main(String[] args) throws InterruptedException, PlatformAlreadyAssignedException {
+    public static void main(String[] args) {
         buzz(notesTable.get("C5"), 500);
         buzz(notesTable.get("E5"), 500);
         buzz(notesTable.get("G5"), 500);

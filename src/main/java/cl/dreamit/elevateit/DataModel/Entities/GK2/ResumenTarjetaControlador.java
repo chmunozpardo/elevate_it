@@ -4,7 +4,6 @@ import cl.dreamit.elevateit.DataModel.Const.Antipassback;
 import cl.dreamit.elevateit.DataModel.Const.Operation;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
