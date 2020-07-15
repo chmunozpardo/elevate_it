@@ -46,15 +46,28 @@ public class Buzzer extends PinProvider{
         put("A4" , 440.00);
         put("A4#", 466.16);
         put("B4" , 493.88);
+
+        put("C5" , 523.25);
+        put("C5#", 554.37);
+        put("D5" , 587.33);
+        put("D5#", 622.25);
+        put("E5" , 659.25);
+        put("F5" , 698.46);
+        put("F5#", 739.99);
+        put("G5" , 783.99);
+        put("G5#", 830.61);
+        put("A5" , 880.00);
+        put("A5#", 932.33);
+        put("B5" , 987.77);
     }};
 
-    public native void buzz(double frequency, int duration);
+    public static native void buzz(double frequency, int duration);
 
     public static void main(String[] args) throws InterruptedException, PlatformAlreadyAssignedException {
-        System.out.println("<--Pi4J--> GPIO Control Example ... started.");
-        new Buzzer().buzz(notesTable.get("C4"), 1);
-        new Buzzer().buzz(notesTable.get("E4"), 1);
-        new Buzzer().buzz(notesTable.get("G4"), 1);
-        System.out.println("<--Pi4J--> GPIO Control Example ... end.");
+        buzz(notesTable.get("C5"), 500);
+        buzz(notesTable.get("E5"), 500);
+        buzz(notesTable.get("G5"), 500);
+        buzz(notesTable.get("E5"), 500);
+        buzz(notesTable.get("C5"), 500);
     }
 }

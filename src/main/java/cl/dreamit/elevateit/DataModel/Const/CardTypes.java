@@ -4,7 +4,7 @@ public abstract class CardTypes {
     public static final int NULL_CARD = 0;
     public static final int PERSON_ID = 1;
     public static final int RFID_ID = 2;
-    public static final int RESERVATION_ID = 3; //id conjunto reserva, lectura de QR Invitacion
+    public static final int RESERVATION_ID = 3;
     public static final int EVENT_ID = 4;
     public static final int MIFARE_ID = 5;
     public static final int BP_ID = 6;

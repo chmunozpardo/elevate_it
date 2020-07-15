@@ -15,38 +15,45 @@ import java.util.List;
 public enum CanalesHorarios {
     INSTANCE;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public void save(CanalHorario[] canales){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        List<CanalHorario> canalesList = Arrays.asList(canales);
-        try{
-            entityManager.getTransaction().begin();
-            for (Iterator<CanalHorario> it = canalesList.iterator(); it.hasNext();) {
-                CanalHorario enquiry = it.next();
-                entityManager.merge(enquiry);
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            List<CanalHorario> canalesList = Arrays.asList(canales);
+            try{
+                entityManager.getTransaction().begin();
+                for (Iterator<CanalHorario> it = canalesList.iterator(); it.hasNext();) {
+                    CanalHorario enquiry = it.next();
+                    entityManager.merge(enquiry);
+                }
+                entityManager.getTransaction().commit();
+                entityManager.clear();
+            } catch (Exception ex){
+                entityManager.getTransaction().rollback();
             }
-            entityManager.getTransaction().commit();
-            entityManager.clear();
-        } catch (Exception ex){
-            entityManager.getTransaction().rollback();
+            entityManager.close();
         }
-        entityManager.close();
     }
 
     public CanalHorario getById(int id_canal_horario){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT c FROM CanalHorario c " +
-            "WHERE id = :id_canal_horario " +
-            "AND deleted_at IS NULL"
-        )
-        .setParameter("id_canal_horario", id_canal_horario);
-        CanalHorario outputCanalHorario;
-        try {
-            outputCanalHorario = (CanalHorario) query.getSingleResult();
-        } catch (NoResultException ex){
-            outputCanalHorario = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT c FROM CanalHorario c " +
+                "WHERE id = :id_canal_horario " +
+                "AND deleted_at IS NULL"
+            )
+            .setParameter("id_canal_horario", id_canal_horario);
+            CanalHorario outputCanalHorario;
+            try {
+                outputCanalHorario = (CanalHorario) query.getSingleResult();
+            } catch (NoResultException ex){
+                outputCanalHorario = null;
+            }
+            entityManager.close();
+            return outputCanalHorario;
         }
-        entityManager.close();
-        return outputCanalHorario;
     }
 }

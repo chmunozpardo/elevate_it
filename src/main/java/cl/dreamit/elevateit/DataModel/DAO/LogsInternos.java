@@ -10,16 +10,21 @@ import javax.persistence.PersistenceContext;
 public enum LogsInternos {
     INSTANCE;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public void save(LogInterno log){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        try{
-            entityManager.getTransaction().begin();
-            entityManager.persist(log);
-            entityManager.getTransaction().commit();
-            entityManager.clear();
-        } catch (Exception ex){
-            entityManager.getTransaction().rollback();
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            try{
+                entityManager.getTransaction().begin();
+                entityManager.persist(log);
+                entityManager.getTransaction().commit();
+                entityManager.clear();
+            } catch (Exception ex){
+                entityManager.getTransaction().rollback();
+            }
+            entityManager.close();
         }
-        entityManager.close();
     }
 }

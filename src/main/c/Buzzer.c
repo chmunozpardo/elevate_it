@@ -27,6 +27,7 @@ JNIEXPORT void JNICALL Java_cl_dreamit_elevateit_Hardware_Buzzer_buzz(
     }
 
     uint64_t period = (uint64_t) (1000000.0/frequency)/2.0;
+    uint64_t duration_v = duration*1000;
     struct timeval stop, start;
     struct timeval freq_stop, freq_start;
     pinMode(BUZZER_PIN, OUTPUT);
@@ -35,7 +36,7 @@ JNIEXPORT void JNICALL Java_cl_dreamit_elevateit_Hardware_Buzzer_buzz(
     int buzzValue = 0;
     while(true){
         gettimeofday(&stop, NULL);
-        if((stop.tv_sec - start.tv_sec) > duration){
+        if((stop.tv_usec - start.tv_usec) > duration_v){
             digitalWrite(BUZZER_PIN, 0);
             return;
         } else {

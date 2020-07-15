@@ -14,47 +14,56 @@ import java.util.List;
 public enum Configuraciones {
     INSTANCE;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public List<Configuracion> getAll(){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT c FROM Configuracion c"
-        );
-        List<Configuracion> outConfiguracion = null;
-        try {
-            outConfiguracion = (List<Configuracion>) query.getResultList();
-        } catch(NoResultException ex) {
-            outConfiguracion = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT c FROM Configuracion c"
+            );
+            List<Configuracion> outConfiguracion = null;
+            try {
+                outConfiguracion = (List<Configuracion>) query.getResultList();
+            } catch(NoResultException ex) {
+                outConfiguracion = null;
+            }
+            entityManager.close();
+            return outConfiguracion;
         }
-        entityManager.close();
-        return outConfiguracion;
     }
 
     public Configuracion getParametro(String parametro){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT c FROM Configuracion c WHERE parametro LIKE :parametro"
-        )
-        .setParameter("parametro", parametro);
-        Configuracion outConfiguracion = null;
-        try {
-            outConfiguracion = (Configuracion) query.getSingleResult();
-        } catch(NoResultException ex) {
-            outConfiguracion = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT c FROM Configuracion c WHERE parametro LIKE :parametro"
+            )
+            .setParameter("parametro", parametro);
+            Configuracion outConfiguracion = null;
+            try {
+                outConfiguracion = (Configuracion) query.getSingleResult();
+            } catch(NoResultException ex) {
+                outConfiguracion = null;
+            }
+            entityManager.close();
+            return outConfiguracion;
         }
-        entityManager.close();
-        return outConfiguracion;
     }
 
     public void save(Configuracion p){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        try{
-            entityManager.getTransaction().begin();
-            entityManager.merge(p);
-            entityManager.getTransaction().commit();
-            entityManager.clear();
-        } catch (Exception ex){
-            entityManager.getTransaction().rollback();
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            try{
+                entityManager.getTransaction().begin();
+                entityManager.merge(p);
+                entityManager.getTransaction().commit();
+                entityManager.clear();
+            } catch (Exception ex){
+                entityManager.getTransaction().rollback();
+            }
+            entityManager.close();
         }
-        entityManager.close();
     }
 }

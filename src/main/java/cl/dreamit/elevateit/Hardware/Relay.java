@@ -1,7 +1,7 @@
 package cl.dreamit.elevateit.Hardware;
 
-import java.io.IOException;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,15 +9,15 @@ import java.util.Map;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
 import cl.dreamit.elevateit.Configuration.CONF;
 @SuppressWarnings("serial")
-public class Relay {
+public enum Relay {
+    INSTANCE;
 
     private I2CBus busI2C;
-    private I2CDevice deviceI2C;
-    private int responseI2C;
+    private List<I2CDevice> devicesI2C = new ArrayList<I2CDevice>();;
+    private List<Integer> accessPoints = new ArrayList<Integer>();
 
     private Map<Integer, String> commandsPCA9555 = new HashMap<Integer, String>() {{
         put(0, "Input port 0");
@@ -30,31 +30,30 @@ public class Relay {
         put(7, "Configuration port 1");
     }};
 
-    public Relay(int controllerAddress) throws IOException, UnsupportedBusNumberException {
-        busI2C = I2CFactory.getInstance(I2CBus.BUS_0);
-        deviceI2C = busI2C.getDevice(controllerAddress);
-        deviceI2C.write(0x02, (byte)0x00);
-        deviceI2C.write(0x03, (byte)0x00);
-        deviceI2C.write(0x06, (byte)0x00);
-        deviceI2C.write(0x07, (byte)0x00);
+    private Relay() {
+        try{
+            busI2C = I2CFactory.getInstance(I2CBus.BUS_0);
+            for(Integer address : CONF.I2C_ADDRESSES){
+                I2CDevice i2cdevice = busI2C.getDevice(address);
+                devicesI2C.add(i2cdevice);
+                for(int i = 0; i < 16; i++){
+                    accessPoints.add(0);
+                }
+                i2cdevice.write(0x02, (byte)0x00);
+                i2cdevice.write(0x03, (byte)0x00);
+                i2cdevice.write(0x06, (byte)0x00);
+                i2cdevice.write(0x07, (byte)0x00);
+            }
+        } catch(Exception ex){}
     }
 
     public void openRelay(int puntoAcceso) {
         new Thread(() -> {
             try{
-                int addr = 0;
-                if(puntoAcceso < 8){
-                    addr = 0x02;
-                } else if(puntoAcceso >= 8){
-                    addr = 0x03;
-                }
-                int read_data = deviceI2C.read(addr);
-                read_data |= (0x01 << (puntoAcceso % 8));
-                deviceI2C.write(addr, (byte)read_data);
+                List<Integer> puntosAcceso = Arrays.asList(puntoAcceso);
+                setRelays(puntosAcceso);
                 Thread.sleep(CONF.DEFAULT_OPEN_TIME);
-                read_data = deviceI2C.read(addr);
-                read_data &= ~(0x01 << (puntoAcceso % 8));
-                deviceI2C.write(addr, (byte)read_data);
+                releaseRelays(puntosAcceso);
             } catch(Exception ignored) {}
         }).start();
     }
@@ -62,26 +61,58 @@ public class Relay {
     public void openRelay(List<Integer> puntosAcceso) {
         new Thread(() -> {
             try{
-                int writeData = 0;
-                for(Integer puntoAcceso : puntosAcceso){
-                    writeData |= (0x01 << puntoAcceso);
-                }
-                int lowerData = writeData & (0xFF);
-                int upperData = (writeData >> 8) & (0xFF);
-                int readLowerData = deviceI2C.read(0x02);
-                int readUpperData = deviceI2C.read(0x03);
-                readLowerData |= lowerData;
-                readUpperData |= upperData;
-                deviceI2C.write(0x02, (byte)readLowerData);
-                deviceI2C.write(0x03, (byte)readUpperData);
+                setRelays(puntosAcceso);
                 Thread.sleep(CONF.DEFAULT_OPEN_TIME);
-                readLowerData = deviceI2C.read(0x02);
-                readLowerData &= ~lowerData;
-                deviceI2C.write(0x02, (byte)readLowerData);
-                readUpperData = deviceI2C.read(0x03);
-                readUpperData &= ~upperData;
-                deviceI2C.write(0x03, (byte)readUpperData);
+                releaseRelays(puntosAcceso);
             } catch(Exception ignored) {}
         }).start();
+    }
+
+    private synchronized void setRelays(List<Integer> puntosAcceso){
+        int writeData = 0;
+        for(int i = 0; i < puntosAcceso.size(); i++){
+            int val = puntosAcceso.get(i).intValue();
+            Integer tempAccessPoint = new Integer(accessPoints.get(val).intValue() + 1);
+            accessPoints.set(val, tempAccessPoint.intValue());
+        }
+        for(int i = 0; i < accessPoints.size(); i++){
+            if(accessPoints.get(i).intValue() > 0){
+                writeData |= (1 << i);
+            }
+        }
+        for(int i = 0; i < devicesI2C.size(); i++){
+            int writeData16 = (writeData >> (16*i));
+            int lowerData = writeData16 & (0xFF);
+            int upperData = (writeData16 >> 8) & (0xFF);
+            try{
+                devicesI2C.get(i).write(0x02, (byte)lowerData);
+                devicesI2C.get(i).write(0x03, (byte)upperData);
+            } catch(Exception ex){}
+            i++;
+        }
+    }
+
+    private synchronized void releaseRelays(List<Integer> puntosAcceso){
+        int writeData = 0;
+        for(int i = 0; i < puntosAcceso.size(); i++){
+            int val = puntosAcceso.get(i).intValue();
+            Integer tempAccessPoint = new Integer(accessPoints.get(val).intValue() - 1);
+            accessPoints.set(val, tempAccessPoint.intValue());
+        }
+        for(int i = 0; i < accessPoints.size(); i++){
+            if(accessPoints.get(i).intValue() > 0){
+                writeData |= (1 << i);
+            }
+        }
+        for(int i = 0; i < devicesI2C.size(); i++){
+            int writeData16 = (writeData >> (16*i));
+            int lowerData = writeData16 & (0xFF);
+            int upperData = (writeData16 >> 8) & (0xFF);
+            try{
+                devicesI2C.get(i).write(0x02, (byte)lowerData);
+                devicesI2C.get(i).write(0x03, (byte)upperData);
+            } catch(Exception ex) {}
+            i++;
+        }
     }
 }

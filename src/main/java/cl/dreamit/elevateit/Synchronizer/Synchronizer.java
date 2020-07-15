@@ -97,25 +97,19 @@ public class Synchronizer implements Runnable {
 
             HttpRequest request = new HttpRequest(apiURL + CONF.URL_SYNC_DATA, postData);
             String respuesta = request.getResponse();
-            //Log.error("Respuesta de Sync: " + respuesta);
-
             try {
                 RespuestaSincronizacion syncResponse = new Gson().fromJson(respuesta, RespuestaSincronizacion.class);
                 if (syncResponse.estado.equals("OK")) {
                     lastSyncTimestamp = syncResponse.currentTimestamp;
-                    //actualizarFechaHora(syncResponse.localTime); //Descartado. Solo Apps a nivel de sistema pueden hacer esto.
                     TarjetasAcceso.INSTANCE.save(syncResponse.tarjetas);
                     //TODO podría ser posible almacenar todo y filo; con un algoritmo de limpieza no debería ser problema el almacenamiento
                     almacenarReservas(syncResponse.reservas);
                     almacenarControlador(syncResponse.controlador);
                     almacenarCanalesHorarios(syncResponse.canalesHorarios);
-                    //Los comandosManuales deben ser procesados. Pero en un hilo independiente.
                     ProcesadorComandosManuales.INSTANCE.procesarComandos(syncResponse.comandos);
-                    ComandosManuales.INSTANCE.save(syncResponse.comandos); //Los Comandos manuales no tiene sentido almacenarlos; Solo procesarlos.
-                    //Cargamos los ultimos ID subidos en la tabla de configuracion.
+                    ComandosManuales.INSTANCE.save(syncResponse.comandos);
                     actualizarUltimosID(ultimosID);
                 } else if (syncResponse.estado.equals("ERROR")) {
-                    //Hubo error. Verifica el tipo de error.
                     switch (syncResponse.error) {
                         case "":
                             Log.error("Error no especificado. Revisar plataforma");
@@ -127,7 +121,6 @@ public class Synchronizer implements Runnable {
                 }
             } catch (Exception ex) {
                 Log.error("Error decodificando JSON: " + ex.getMessage());
-                //Log.error("JSON Input: " + respuesta);
                 Log.error("URL: " + request.toString());
                 ex.printStackTrace();
             }
@@ -140,8 +133,8 @@ public class Synchronizer implements Runnable {
         parametrosRegistro.put("ip", NetworkUtil.getAddress("ip"));
         parametrosRegistro.put("mac", NetworkUtil.getAddress("mac"));
         parametrosRegistro.put("gateway", "192.168.1.1");
-        parametrosRegistro.put("serie", "1234lander");
-        parametrosRegistro.put("modelo", "elevateIT");
+        parametrosRegistro.put("serie", CONF.SERIE);
+        parametrosRegistro.put("modelo", CONF.MODEL);
         parametrosRegistro.put("version", Double.toString(CONF.VERSION_FULL_ACCESS));
         parametrosRegistro.put("cantidadCanales", CONF.CANTIDAD_CANALES);
         parametrosRegistro.put("capturaHuellas", CONF.CAPTURA_HUELLAS);
@@ -159,26 +152,20 @@ public class Synchronizer implements Runnable {
         try {
             RespuestaRegistroGK respuestaGK = new Gson().fromJson(respuesta, RespuestaRegistroGK.class);
             if (respuestaGK.estado.equals("OK")) {
-                //Están los parámetros necesarios para el registro?
                 if (respuestaGK.apitoken == null || respuestaGK.base_datos == null || respuestaGK.idDevice == null) {
-                    //Lanza el dialog error.
                     Log.error("Parámetros de respuesta incompletos");
                 } else {
-                    //Registro OK. Copia los datos de registro en nuestra DB local.
                     Configuraciones.INSTANCE.save(new Configuracion(Parametro.API_TOKEN, respuestaGK.apitoken));
                     Configuraciones.INSTANCE.save(new Configuracion(Parametro.DATABASE, respuestaGK.base_datos));
                     Configuraciones.INSTANCE.save(new Configuracion(Parametro.DEVICE_ID, Long.toString(respuestaGK.idDevice)));
                     Log.error("Registro de configuraciones correcto");
-                    //Lanza el dialog successfull.
                 }
             } else {
-                //Lanza el dialog error.
                 Log.error("Estado de respuesta erróneo");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
             Log.error("Exception en respuesta");
-            //Lanza el dialog error.
         }
     }
 
@@ -245,7 +232,6 @@ public class Synchronizer implements Runnable {
             int lastLog = getLastUploadID(tabla);
             List<UploadableEntity> data = tablasSubida.get(i).getNewerThan(lastLog);
             if (data != null && !data.isEmpty()) {
-                //LOG.error("Cargando datos de tabla: %s: %s", tabla, data.toString());
                 long idMaximo = 0L;
                 for (UploadableEntity ue : data) {
                     if (ue.getID() > idMaximo) {
@@ -262,10 +248,8 @@ public class Synchronizer implements Runnable {
     }
 
     private void almacenarReservas(Reserva[] reservas) {
-        //Primero almacenamos las reservas propiamente tal.
         Reservas.INSTANCE.save(reservas);
 
-        //Luego almacenamos los elementos anidados.
         List<ConjuntoReserva> conjuntosReservas = new ArrayList<>();
         List<Estacionamiento> estacionamientos = new ArrayList<>();
         List<Persona> personas = new ArrayList<>();
@@ -303,12 +287,10 @@ public class Synchronizer implements Runnable {
     }
 
     private void setLastUploadID(String tabla, Long id) {
-        //Verifica si existe dicho valor, se antepone el string "lastUploadID_" al nombre de la tabla.
         Configuracion p = Configuraciones.INSTANCE.getParametro(Parametro.LAST_UPLOAD_ID_PREFIX + tabla);
         if (p == null) {
             Configuraciones.INSTANCE.save(new Configuracion(Parametro.LAST_UPLOAD_ID_PREFIX + tabla, String.format(Locale.US, "%d", id)));
         } else {
-            // Parámetro ya existe. Actualízalo.
             p.valor = String.format(Locale.US, "%d", id);
             Configuraciones.INSTANCE.save(p);
         }

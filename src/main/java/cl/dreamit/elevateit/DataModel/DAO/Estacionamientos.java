@@ -14,36 +14,43 @@ import java.util.List;
 public enum Estacionamientos {
     INSTANCE;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public void save(List<Estacionamiento> estacionamientos){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        List<Estacionamiento> reservasList = estacionamientos;
-        try{
-            entityManager.getTransaction().begin();
-            for (Iterator<Estacionamiento> it = reservasList.iterator(); it.hasNext();) {
-                Estacionamiento enquiry = it.next();
-                entityManager.merge(enquiry);
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            List<Estacionamiento> reservasList = estacionamientos;
+            try{
+                entityManager.getTransaction().begin();
+                for (Iterator<Estacionamiento> it = reservasList.iterator(); it.hasNext();) {
+                    Estacionamiento enquiry = it.next();
+                    entityManager.merge(enquiry);
+                }
+                entityManager.getTransaction().commit();
+                entityManager.clear();
+            } catch (Exception ex){
+                entityManager.getTransaction().rollback();
             }
-            entityManager.getTransaction().commit();
-            entityManager.clear();
-        } catch (Exception ex){
-            entityManager.getTransaction().rollback();
+            entityManager.close();
         }
-        entityManager.close();
     }
 
     public Estacionamiento getByID(int id_estacionamiento){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT e FROM Estacionamiento e WHERE id = :id_estacionamiento"
-        )
-        .setParameter("id_estacionamiento", id_estacionamiento);
-        Estacionamiento outputResult;
-        try{
-            outputResult = (Estacionamiento) query.getSingleResult();
-        } catch(NoResultException ex){
-            outputResult = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT e FROM Estacionamiento e WHERE id = :id_estacionamiento"
+            )
+            .setParameter("id_estacionamiento", id_estacionamiento);
+            Estacionamiento outputResult;
+            try{
+                outputResult = (Estacionamiento) query.getSingleResult();
+            } catch(NoResultException ex){
+                outputResult = null;
+            }
+            entityManager.close();
+            return outputResult;
         }
-        entityManager.close();
-        return outputResult;
     }
 }

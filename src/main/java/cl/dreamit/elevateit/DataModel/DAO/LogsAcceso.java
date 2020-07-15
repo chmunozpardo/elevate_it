@@ -14,67 +14,78 @@ import java.util.List;
 public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     INSTANCE;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public List<LogAcceso> getAll(){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT r FROM LogAcceso r"
-        );
-        List<LogAcceso> outputResult;
-        try{
-            outputResult = (List<LogAcceso>) query.getResultList();
-        } catch(NoResultException ex) {
-            outputResult = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT r FROM LogAcceso r"
+            );
+            List<LogAcceso> outputResult;
+            try{
+                outputResult = (List<LogAcceso>) query.getResultList();
+            } catch(NoResultException ex) {
+                outputResult = null;
+            }
+            entityManager.close();
+            return outputResult;
         }
-        entityManager.close();
-        return outputResult;
     }
 
     public List<LogAcceso> getNewerThan(int lastID){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
-        )
-        .setMaxResults(100)
-        .setParameter("lastID", lastID);
-        List<LogAcceso> outputResult;
-        try{
-            outputResult = (List<LogAcceso>) query.getResultList();
-        } catch(NoResultException ex) {
-            outputResult = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
+            )
+            .setMaxResults(100)
+            .setParameter("lastID", lastID);
+            List<LogAcceso> outputResult;
+            try{
+                outputResult = (List<LogAcceso>) query.getResultList();
+            } catch(NoResultException ex) {
+                outputResult = null;
+            }
+            entityManager.close();
+            return outputResult;
         }
-        entityManager.close();
-        return outputResult;
     }
 
     public List<LogAcceso> getNewerThan(long lastID, long offset){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
-        )
-        .setFirstResult((int) offset)
-        .setMaxResults(100)
-        .setParameter("lastID", lastID);
-        List<LogAcceso> outputResult;
-        try{
-            outputResult = (List<LogAcceso>) query.getResultList();
-        } catch(NoResultException ex) {
-            outputResult = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT r FROM LogAcceso r WHERE id > :lastID ORDER BY id ASC"
+            )
+            .setFirstResult((int) offset)
+            .setMaxResults(100)
+            .setParameter("lastID", lastID);
+            List<LogAcceso> outputResult;
+            try{
+                outputResult = (List<LogAcceso>) query.getResultList();
+            } catch(NoResultException ex) {
+                outputResult = null;
+            }
+            entityManager.close();
+            return outputResult;
         }
-        entityManager.close();
-        return outputResult;
     }
 
     public void save(LogAcceso acceso){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        try{
-            entityManager.getTransaction().begin();
-            entityManager.persist(acceso);
-            entityManager.getTransaction().commit();
-            entityManager.clear();
-        } catch (Exception ex){
-            entityManager.getTransaction().rollback();
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            try{
+                entityManager.getTransaction().begin();
+                entityManager.persist(acceso);
+                entityManager.getTransaction().commit();
+                entityManager.clear();
+            } catch (Exception ex){
+                entityManager.getTransaction().rollback();
+            }
+            entityManager.close();
         }
-        entityManager.close();
     }
 
     public String getTable(){

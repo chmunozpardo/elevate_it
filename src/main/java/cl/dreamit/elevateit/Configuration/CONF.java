@@ -1,5 +1,8 @@
 package cl.dreamit.elevateit.Configuration;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Se encarga de almacenar todas las variables de configuracion que usa el sistema
  */
@@ -41,4 +44,11 @@ public class CONF {
 
     // Tiempo de apertura por defecto en milisegundos
     public final static int DEFAULT_OPEN_TIME = 5000;
+
+    public final static String MODEL = "elevateIT";
+
+    public final static String SERIE = "NanopiNeoPlus2";
+
+    // Lista de controladores I2C para los relés
+    public final static List<Integer> I2C_ADDRESSES = Arrays.asList(0x20);
 }

@@ -14,34 +14,41 @@ import java.util.List;
 public enum ReservasValidadas implements UploadableDAO<ReservaValidada>{
     INSTANCE;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     public void save(ReservaValidada r){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        try{
-            entityManager.getTransaction().begin();
-            entityManager.persist(r);
-            entityManager.getTransaction().commit();
-            entityManager.clear();
-        } catch (Exception ex){
-            entityManager.getTransaction().rollback();
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            try{
+                entityManager.getTransaction().begin();
+                entityManager.persist(r);
+                entityManager.getTransaction().commit();
+                entityManager.clear();
+            } catch (Exception ex){
+                entityManager.getTransaction().rollback();
+            }
+            entityManager.close();
         }
-        entityManager.close();
     }
 
     public List<ReservaValidada> getNewerThan(int lastID){
-        EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
-        Query query = entityManager.createQuery(
-            "SELECT r FROM ReservaValidada r WHERE id > :lastID ORDER BY id ASC"
-        )
-        .setMaxResults(100)
-        .setParameter("lastID", lastID);
-        List<ReservaValidada> outputResult;
-        try {
-            outputResult = (List<ReservaValidada>) query.getResultList();
-        } catch(NoResultException ex) {
-            outputResult = null;
+        synchronized(this){
+            entityManager = PersistenceManager.INSTANCE.getEntityManager();
+            Query query = entityManager.createQuery(
+                "SELECT r FROM ReservaValidada r WHERE id > :lastID ORDER BY id ASC"
+            )
+            .setMaxResults(100)
+            .setParameter("lastID", lastID);
+            List<ReservaValidada> outputResult;
+            try {
+                outputResult = (List<ReservaValidada>) query.getResultList();
+            } catch(NoResultException ex) {
+                outputResult = null;
+            }
+            entityManager.close();
+            return outputResult;
         }
-        entityManager.close();
-        return outputResult;
     }
 
     public String getTable(){

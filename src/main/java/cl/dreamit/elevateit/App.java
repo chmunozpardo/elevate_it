@@ -13,18 +13,13 @@ public final class App{
 
     public static void main(String[] args) throws InterruptedException, IOException{
 
-        System.out.println("Hello World!");
+        System.out.println("ElevateIT@DREAMIT Starting...");
 
         java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.SEVERE);
 
         Thread sync = new Thread(new Synchronizer());
+        Thread rfid = new Thread(new Wiegand());
         sync.start();
-
-        Wiegand test = new Wiegand();
-        while(true){
-            test.readCard();
-            test.print();
-            test.searchCard();
-        }
+        rfid.start();
     }
 }

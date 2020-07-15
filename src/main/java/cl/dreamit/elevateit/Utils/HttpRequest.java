@@ -61,7 +61,7 @@ public class HttpRequest {
     public String getResponse() {
         String retorno = "";
         String paramURL = this.serializeParameters();
-        Log.info(address + "0" + paramURL, true);
+        Log.info(address + "?" + paramURL, false);
         while (retrys > 0) {
             HttpURLConnection conexion = null;
             try {
