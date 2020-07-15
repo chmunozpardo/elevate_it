@@ -36,7 +36,7 @@ import cl.dreamit.elevateit.Utils.Util;
 
 public class Wiegand {  // Save as HelloJNI.java
     static {
-        System.loadLibrary("wiegandreader"); // myjni.dll (Windows) or libmyjni.so (Unixes)
+        System.loadLibrary("elevateit");
     }
 
     // Instance variables
