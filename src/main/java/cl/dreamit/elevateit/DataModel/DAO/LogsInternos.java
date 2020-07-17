@@ -3,6 +3,9 @@ package cl.dreamit.elevateit.DataModel.DAO;
 import cl.dreamit.elevateit.DataModel.Entities.FullAccess.LogInterno;
 
 import cl.dreamit.elevateit.Utils.PersistenceManager;
+import cl.dreamit.elevateit.Utils.Util;
+
+import java.time.LocalDateTime;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,13 +28,17 @@ public enum LogsInternos {
     }
 
     public synchronized void clean(){
-        Query query = entityManager.createQuery(
-            "DELETE l FROM LogInterno l WHERE l.fecha < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 180 DAY))"
-        );
         try{
+            LocalDateTime date = LocalDateTime.now().minusDays(14);
+            entityManager.getTransaction().begin();
+            Query query = entityManager.createQuery(
+                "DELETE FROM LogInterno l WHERE l.fecha < :date"
+            )
+            .setParameter("date", Util.getDateTime(date));
             query.executeUpdate();
+            entityManager.getTransaction().commit();
         } catch (Exception ex){
-            System.out.println("Couldn't clean");
+            System.out.println("Couldn't clean" + ex);
         }
     }
 }

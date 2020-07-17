@@ -28,6 +28,15 @@ public class PuntoAcceso {
     @Transient
     public ParametroPuntoAcceso[] parametros_punto_acceso;
 
+    public String tipoApertura(){
+        ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "contactoApertura");
+        if (p == null) {
+            return "NC";
+        }
+        String tipoApertura = p.valor_override != null ? p.valor_override : p.valor;
+        return tipoApertura;
+    }
+
     public boolean esEntrada() {
         ParametroPuntoAcceso p = ParametrosPuntosAccesos.INSTANCE.getParametroPuntoAcceso(this.id, "sentido");
         if (p == null) {

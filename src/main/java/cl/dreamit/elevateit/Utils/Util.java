@@ -3,6 +3,8 @@ package cl.dreamit.elevateit.Utils;
 import java.util.Calendar;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class Util {
@@ -12,6 +14,10 @@ public class Util {
     public static String getDateTime(Date date) {
        return dateFormat.format(date);
     }
+
+    public static String getDateTime(LocalDateTime date) {
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:s"));
+     }
 
     public static String bytesToHexString(byte[] src, boolean addSpace) {
         return src != null ? bytesToHexString(src, addSpace, src.length) : "";

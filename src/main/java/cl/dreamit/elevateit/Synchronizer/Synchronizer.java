@@ -15,6 +15,7 @@ import cl.dreamit.elevateit.DataModel.DAO.ConjuntosReservas;
 import cl.dreamit.elevateit.DataModel.DAO.Controladores;
 import cl.dreamit.elevateit.DataModel.DAO.Estacionamientos;
 import cl.dreamit.elevateit.DataModel.DAO.LogsAcceso;
+import cl.dreamit.elevateit.DataModel.DAO.LogsInternos;
 import cl.dreamit.elevateit.DataModel.DAO.ParametrosControladores;
 import cl.dreamit.elevateit.DataModel.DAO.ParametrosPuntosAccesos;
 import cl.dreamit.elevateit.DataModel.DAO.Personas;
@@ -86,6 +87,8 @@ public class Synchronizer implements Runnable {
         while(true){
             if(SyncControl.INSTANCE.getState()){
                 try{
+                    LogsAcceso.INSTANCE.clean();
+                    LogsInternos.INSTANCE.clean();
                     Thread.sleep(CONF.TIME_SYNC);
                 } catch (InterruptedException ex){}
                 SyncMessage message = new SyncMessage(lastSyncTimestamp);

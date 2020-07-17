@@ -2,12 +2,14 @@ package cl.dreamit.elevateit.DataModel.DAO;
 
 import cl.dreamit.elevateit.DataModel.Entities.GK2.LogAcceso;
 import cl.dreamit.elevateit.Utils.PersistenceManager;
+import cl.dreamit.elevateit.Utils.Util;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -72,13 +74,17 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
     }
 
     public synchronized void clean(){
-        Query query = entityManager.createQuery(
-            "DELETE l FROM LogAcceso l WHERE l.fecha_registro < UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 180 DAY))"
-        );
         try{
+            LocalDateTime date = LocalDateTime.now().minusDays(14);
+            entityManager.getTransaction().begin();
+            Query query = entityManager.createQuery(
+                "DELETE FROM LogAcceso l WHERE l.fecha_registro < :date"
+            )
+            .setParameter("date", Util.getDateTime(date));
             query.executeUpdate();
+            entityManager.getTransaction().commit();
         } catch (Exception ex){
-            System.out.println("Couldn't clean");
+            System.out.println("Couldn't clean" + ex);
         }
     }
 
