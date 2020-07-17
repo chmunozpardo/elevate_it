@@ -5,6 +5,7 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
   version="2.1">
   <persistence-unit name="elevateIT" transaction-type="RESOURCE_LOCAL">
   <provider>org.hibernate.ejb.HibernatePersistence</provider>
+  <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
   <properties>
     <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/elevate_it" />
     <property name="javax.persistence.jdbc.user" value="admin" />
@@ -14,6 +15,9 @@ http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
     <property name="hibernate.format_sql" value="true" />
     <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
     <property name="hibernate.hbm2ddl.auto" value="update"/>
+    <property name="hibernate.cache.use_query_cache" value="false"/>
+    <property name="hibernate.cache.use_second_level_cache" value="false"/>
+    <property name="org.hibernate.flushMode" value="COMMIT"/>
     <!-- Configuring Connection Pool
     <property name="hibernate.c3p0.min_size" value="5" />
     <property name="hibernate.c3p0.max_size" value="20" />

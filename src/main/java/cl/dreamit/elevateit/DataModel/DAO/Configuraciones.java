@@ -15,55 +15,42 @@ public enum Configuraciones {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public List<Configuracion> getAll(){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT c FROM Configuracion c"
-            );
-            List<Configuracion> outConfiguracion = null;
-            try {
-                outConfiguracion = (List<Configuracion>) query.getResultList();
-            } catch(NoResultException ex) {
-                outConfiguracion = null;
-            }
-            entityManager.close();
-            return outConfiguracion;
+    public synchronized List<Configuracion> getAll(){
+        Query query = entityManager.createQuery(
+            "SELECT c FROM Configuracion c"
+        );
+        List<Configuracion> outConfiguracion = null;
+        try {
+            outConfiguracion = (List<Configuracion>) query.getResultList();
+        } catch(NoResultException ex) {
+            outConfiguracion = null;
         }
+        return outConfiguracion;
     }
 
-    public Configuracion getParametro(String parametro){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT c FROM Configuracion c WHERE parametro LIKE :parametro"
-            )
-            .setParameter("parametro", parametro);
-            Configuracion outConfiguracion = null;
-            try {
-                outConfiguracion = (Configuracion) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outConfiguracion = null;
-            }
-            entityManager.close();
-            return outConfiguracion;
+    public synchronized Configuracion getParametro(String parametro){
+        Query query = entityManager.createQuery(
+            "SELECT c FROM Configuracion c WHERE parametro LIKE :parametro"
+        )
+        .setParameter("parametro", parametro);
+        Configuracion outConfiguracion = null;
+        try {
+            outConfiguracion = (Configuracion) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outConfiguracion = null;
         }
+        return outConfiguracion;
     }
 
-    public void save(Configuracion p){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            try{
-                entityManager.getTransaction().begin();
-                entityManager.merge(p);
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
-            }
-            entityManager.close();
+    public synchronized void save(Configuracion p){
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(p);
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 }

@@ -84,88 +84,47 @@ public class Synchronizer implements Runnable {
         }
         lastSyncTimestamp = Long.parseLong(timeStamp.valor);
         while(true){
-            try{
-                Thread.sleep(CONF.TIME_SYNC);
-            } catch (InterruptedException ex){}
-            SyncMessage message = new SyncMessage(lastSyncTimestamp);
-            Map<String, Long> ultimosID = cargarDatos(message);
-            Map<String, Object> postData = new HashMap<>();
-            postData.put("api_token", apiToken);
-            postData.put("nombreInstancia", targetDatabase);
-            postData.put("syncData", message);
-            postData.put("fechaValidez", Util.getDateTime(new Date()));
+            if(SyncControl.INSTANCE.getState()){
+                try{
+                    Thread.sleep(CONF.TIME_SYNC);
+                } catch (InterruptedException ex){}
+                SyncMessage message = new SyncMessage(lastSyncTimestamp);
+                Map<String, Long> ultimosID = cargarDatos(message);
+                Map<String, Object> postData = new HashMap<>();
+                postData.put("api_token", apiToken);
+                postData.put("nombreInstancia", targetDatabase);
+                postData.put("syncData", message);
+                postData.put("fechaValidez", Util.getDateTime(new Date()));
 
-            HttpRequest request = new HttpRequest(apiURL + CONF.URL_SYNC_DATA, postData);
-            String respuesta = request.getResponse();
-            try {
-                RespuestaSincronizacion syncResponse = new Gson().fromJson(respuesta, RespuestaSincronizacion.class);
-                if (syncResponse.estado.equals("OK")) {
-                    lastSyncTimestamp = syncResponse.currentTimestamp;
-                    TarjetasAcceso.INSTANCE.save(syncResponse.tarjetas);
-                    //TODO podría ser posible almacenar todo y filo; con un algoritmo de limpieza no debería ser problema el almacenamiento
-                    almacenarReservas(syncResponse.reservas);
-                    almacenarControlador(syncResponse.controlador);
-                    almacenarCanalesHorarios(syncResponse.canalesHorarios);
-                    ProcesadorComandosManuales.INSTANCE.procesarComandos(syncResponse.comandos);
-                    ComandosManuales.INSTANCE.save(syncResponse.comandos);
-                    actualizarUltimosID(ultimosID);
-                } else if (syncResponse.estado.equals("ERROR")) {
-                    switch (syncResponse.error) {
-                        case "":
-                            Log.error("Error no especificado. Revisar plataforma");
-                            break;
-                        case SYNC_ERROR.INVALID_API_TOKEN:
-                            Log.error("El API Token no es válido.");
-                            break;
+                HttpRequest request = new HttpRequest(apiURL + CONF.URL_SYNC_DATA, postData);
+                String respuesta = request.getResponse();
+                try {
+                    RespuestaSincronizacion syncResponse = new Gson().fromJson(respuesta, RespuestaSincronizacion.class);
+                    if (syncResponse.estado.equals("OK")) {
+                        lastSyncTimestamp = syncResponse.currentTimestamp;
+                        TarjetasAcceso.INSTANCE.save(syncResponse.tarjetas);
+                        almacenarReservas(syncResponse.reservas);
+                        almacenarControlador(syncResponse.controlador);
+                        almacenarCanalesHorarios(syncResponse.canalesHorarios);
+                        ProcesadorComandosManuales.INSTANCE.procesarComandos(syncResponse.comandos);
+                        ComandosManuales.INSTANCE.save(syncResponse.comandos);
+                        actualizarUltimosID(ultimosID);
+                    } else if (syncResponse.estado.equals("ERROR")) {
+                        switch (syncResponse.error) {
+                            case "":
+                                Log.info("Error no especificado. Revisar plataforma");
+                                break;
+                            case SYNC_ERROR.INVALID_API_TOKEN:
+                                Log.info("El API Token no es válido.");
+                                break;
+                        }
                     }
+                } catch (Exception ex) {
+                    Log.info("Error decodificando JSON: " + ex.getMessage());
+                    Log.info("URL: " + request.toString());
+                    ex.printStackTrace();
                 }
-            } catch (Exception ex) {
-                Log.error("Error decodificando JSON: " + ex.getMessage());
-                Log.error("URL: " + request.toString());
-                ex.printStackTrace();
             }
-        }
-    }
-
-    public static void registrarDispositivo(String codigoRegistro) {
-        HashMap<String, Object> parametrosRegistro = new HashMap<>();
-        parametrosRegistro.put("code", codigoRegistro);
-        parametrosRegistro.put("ip", NetworkUtil.getAddress("ip"));
-        parametrosRegistro.put("mac", NetworkUtil.getAddress("mac"));
-        parametrosRegistro.put("gateway", "192.168.1.1");
-        parametrosRegistro.put("serie", CONF.SERIE);
-        parametrosRegistro.put("modelo", CONF.MODEL);
-        parametrosRegistro.put("version", Double.toString(CONF.VERSION_FULL_ACCESS));
-        parametrosRegistro.put("cantidadCanales", CONF.CANTIDAD_CANALES);
-        parametrosRegistro.put("capturaHuellas", CONF.CAPTURA_HUELLAS);
-        Configuracion parametroApiURL = Configuraciones.INSTANCE.getParametro("API_URL");
-        if (parametroApiURL == null) {
-            parametroApiURL = new Configuracion();
-            parametroApiURL.parametro = "API_URL";
-            parametroApiURL.valor = CONF.API_URL;
-            Configuraciones.INSTANCE.save(parametroApiURL);
-        }
-        HttpRequest request = new HttpRequest(parametroApiURL.valor + CONF.URL_REGISTER_DEVICE, parametrosRegistro);
-        String respuesta = request.getResponse();
-        Log.error("Respuesta de registro: " + respuesta);
-        Log.error(request.toString());
-        try {
-            RespuestaRegistroGK respuestaGK = new Gson().fromJson(respuesta, RespuestaRegistroGK.class);
-            if (respuestaGK.estado.equals("OK")) {
-                if (respuestaGK.apitoken == null || respuestaGK.base_datos == null || respuestaGK.idDevice == null) {
-                    Log.error("Parámetros de respuesta incompletos");
-                } else {
-                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.API_TOKEN, respuestaGK.apitoken));
-                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.DATABASE, respuestaGK.base_datos));
-                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.DEVICE_ID, Long.toString(respuestaGK.idDevice)));
-                    Log.error("Registro de configuraciones correcto");
-                }
-            } else {
-                Log.error("Estado de respuesta erróneo");
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            Log.error("Exception en respuesta");
         }
     }
 
@@ -342,5 +301,47 @@ public class Synchronizer implements Runnable {
             System.out.println("Error reading from user");
         }
         System.exit(0);
+    }
+
+    public static void registrarDispositivo(String codigoRegistro) {
+        HashMap<String, Object> parametrosRegistro = new HashMap<>();
+        parametrosRegistro.put("code", codigoRegistro);
+        parametrosRegistro.put("ip", NetworkUtil.getAddress("ip"));
+        parametrosRegistro.put("mac", NetworkUtil.getAddress("mac"));
+        parametrosRegistro.put("gateway", "192.168.1.1");
+        parametrosRegistro.put("serie", CONF.SERIE);
+        parametrosRegistro.put("modelo", CONF.MODEL);
+        parametrosRegistro.put("version", Double.toString(CONF.VERSION_FULL_ACCESS));
+        parametrosRegistro.put("cantidadCanales", CONF.CANTIDAD_CANALES);
+        parametrosRegistro.put("capturaHuellas", CONF.CAPTURA_HUELLAS);
+        Configuracion parametroApiURL = Configuraciones.INSTANCE.getParametro("API_URL");
+        if (parametroApiURL == null) {
+            parametroApiURL = new Configuracion();
+            parametroApiURL.parametro = "API_URL";
+            parametroApiURL.valor = CONF.API_URL;
+            Configuraciones.INSTANCE.save(parametroApiURL);
+        }
+        HttpRequest request = new HttpRequest(parametroApiURL.valor + CONF.URL_REGISTER_DEVICE, parametrosRegistro);
+        String respuesta = request.getResponse();
+        Log.info("Respuesta de registro: " + respuesta);
+        Log.info(request.toString());
+        try {
+            RespuestaRegistroGK respuestaGK = new Gson().fromJson(respuesta, RespuestaRegistroGK.class);
+            if (respuestaGK.estado.equals("OK")) {
+                if (respuestaGK.apitoken == null || respuestaGK.base_datos == null || respuestaGK.idDevice == null) {
+                    Log.info("Parámetros de respuesta incompletos");
+                } else {
+                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.API_TOKEN, respuestaGK.apitoken));
+                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.DATABASE, respuestaGK.base_datos));
+                    Configuraciones.INSTANCE.save(new Configuracion(Parametro.DEVICE_ID, Long.toString(respuestaGK.idDevice)));
+                    Log.info("Registro de configuraciones correcto");
+                }
+            } else {
+                Log.info("Estado de respuesta erróneo");
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Log.info("Exception en respuesta");
+        }
     }
 }

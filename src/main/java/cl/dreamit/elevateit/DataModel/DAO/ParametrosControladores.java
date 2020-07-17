@@ -15,58 +15,44 @@ public enum ParametrosControladores {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(List<ParametroControlador> parametrosControlador){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<ParametroControlador> parametrosControladorList = parametrosControlador;
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<ParametroControlador> it = parametrosControladorList.iterator(); it.hasNext();) {
-                    ParametroControlador enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(List<ParametroControlador> parametrosControlador){
+        List<ParametroControlador> parametrosControladorList = parametrosControlador;
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ParametroControlador> it = parametrosControladorList.iterator(); it.hasNext();) {
+                ParametroControlador enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public void save(ParametroControlador parametro){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            try{
-                entityManager.getTransaction().begin();
-                entityManager.merge(parametro);
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
-            }
-            entityManager.close();
+    public synchronized void save(ParametroControlador parametro){
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(parametro);
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public ParametroControlador getParametroControlador(int idControlador, String nombreParametro){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT p FROM ParametroControlador p WHERE id_controlador = :idControlador AND parametro LIKE :nombreParametro"
-            )
-            .setParameter("idControlador", idControlador)
-            .setParameter("nombreParametro", nombreParametro);
-            ParametroControlador outputResult;
-            try{
-                outputResult = (ParametroControlador) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized ParametroControlador getParametroControlador(int idControlador, String nombreParametro){
+        Query query = entityManager.createQuery(
+            "SELECT p FROM ParametroControlador p WHERE id_controlador = :idControlador AND parametro LIKE :nombreParametro"
+        )
+        .setParameter("idControlador", idControlador)
+        .setParameter("nombreParametro", nombreParametro);
+        ParametroControlador outputResult;
+        try{
+            outputResult = (ParametroControlador) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 }

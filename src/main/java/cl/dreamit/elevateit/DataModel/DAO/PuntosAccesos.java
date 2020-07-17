@@ -16,61 +16,48 @@ public enum PuntosAccesos {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(List<PuntoAcceso> puntos){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<PuntoAcceso> reservasList = puntos;
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<PuntoAcceso> it = reservasList.iterator(); it.hasNext();) {
-                    PuntoAcceso enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(List<PuntoAcceso> puntos){
+        List<PuntoAcceso> reservasList = puntos;
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<PuntoAcceso> it = reservasList.iterator(); it.hasNext();) {
+                PuntoAcceso enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public PuntoAcceso getPuntoAccesoControlador(int id, int canal){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id AND numeroCanal = :canal"
-            )
-            .setParameter("id", id)
-            .setParameter("canal", canal);
-            PuntoAcceso outputResult;
-            try {
-                outputResult = (PuntoAcceso) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized PuntoAcceso getPuntoAccesoControlador(int id, int canal){
+        Query query = entityManager.createQuery(
+            "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id AND numeroCanal = :canal"
+        )
+        .setParameter("id", id)
+        .setParameter("canal", canal);
+        PuntoAcceso outputResult;
+        try {
+            outputResult = (PuntoAcceso) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
-    public List<PuntoAcceso> getPuntosAccesoControlador(int id){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id"
-            )
-            .setParameter("id", id);
-            List<PuntoAcceso> outputResult;
-            try {
-                outputResult = (List<PuntoAcceso>) query.getResultList();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized List<PuntoAcceso> getPuntosAccesoControlador(int id){
+        Query query = entityManager.createQuery(
+            "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id"
+        )
+        .setParameter("id", id);
+        List<PuntoAcceso> outputResult;
+        try {
+            outputResult = (List<PuntoAcceso>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 }

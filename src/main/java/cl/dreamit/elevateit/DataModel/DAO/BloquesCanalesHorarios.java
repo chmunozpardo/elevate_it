@@ -17,49 +17,40 @@ public enum BloquesCanalesHorarios {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(BloqueHorario[] bloques){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<BloqueHorario> bloquesList = Arrays.asList(bloques);
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<BloqueHorario> it = bloquesList.iterator(); it.hasNext();) {
-                    BloqueHorario enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(BloqueHorario[] bloques){
+        List<BloqueHorario> bloquesList = Arrays.asList(bloques);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<BloqueHorario> it = bloquesList.iterator(); it.hasNext();) {
+                BloqueHorario enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public List<BloqueHorario> getByDiaHora(int id_canal_horario, String nombreDia, String horaActual) {
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT b FROM BloqueHorario b " +
-                "WHERE id_canal_horario = :id_canal_horario " +
-                "AND dia LIKE :nombreDia " +
-                "AND inicio <= :horaActual " +
-                "AND :horaActual <= fin " +
-                "AND deleted_at IS NULL"
-            )
-            .setParameter("id_canal_horario", id_canal_horario)
-            .setParameter("nombreDia", nombreDia)
-            .setParameter("horaActual", horaActual);
-            List<BloqueHorario> outputList;
-            try{
-                outputList = (List<BloqueHorario>) query.getResultList();
-            } catch(NoResultException ex) {
-                outputList = null;
-            }
-            entityManager.close();
-            return outputList;
+    public synchronized List<BloqueHorario> getByDiaHora(int id_canal_horario, String nombreDia, String horaActual) {
+        Query query = entityManager.createQuery(
+            "SELECT b FROM BloqueHorario b " +
+            "WHERE id_canal_horario = :id_canal_horario " +
+            "AND dia LIKE :nombreDia " +
+            "AND inicio <= :horaActual " +
+            "AND :horaActual <= fin " +
+            "AND deleted_at IS NULL"
+        )
+        .setParameter("id_canal_horario", id_canal_horario)
+        .setParameter("nombreDia", nombreDia)
+        .setParameter("horaActual", horaActual);
+        List<BloqueHorario> outputList;
+        try{
+            outputList = (List<BloqueHorario>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputList = null;
         }
+        return outputList;
     }
 }

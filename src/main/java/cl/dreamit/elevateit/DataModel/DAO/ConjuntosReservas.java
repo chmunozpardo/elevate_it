@@ -15,62 +15,49 @@ public enum ConjuntosReservas {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(List<ConjuntoReserva> conjuntosReservas){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<ConjuntoReserva> reservasList = conjuntosReservas;
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<ConjuntoReserva> it = reservasList.iterator(); it.hasNext();) {
-                    ConjuntoReserva enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(List<ConjuntoReserva> conjuntosReservas){
+        List<ConjuntoReserva> reservasList = conjuntosReservas;
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ConjuntoReserva> it = reservasList.iterator(); it.hasNext();) {
+                ConjuntoReserva enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public ConjuntoReserva getByID(int id_conjunto_reserva){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT c FROM ConjuntoReserva c " +
-                "WHERE id = :id_conjunto_reserva"
-            )
-            .setParameter("id_conjunto_reserva", id_conjunto_reserva);
-            ConjuntoReserva outputResult;
-            try{
-                outputResult = (ConjuntoReserva) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized ConjuntoReserva getByID(int id_conjunto_reserva){
+        Query query = entityManager.createQuery(
+            "SELECT c FROM ConjuntoReserva c " +
+            "WHERE id = :id_conjunto_reserva"
+        )
+        .setParameter("id_conjunto_reserva", id_conjunto_reserva);
+        ConjuntoReserva outputResult;
+        try{
+            outputResult = (ConjuntoReserva) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
-    public ConjuntoReserva getConjuntoReservaCodigoReserva(String codigoAcceso){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT c FROM ConjuntoReserva c " +
-                "WHERE codigo_reserva LIKE :codigoAcceso"
-            )
-            .setParameter("codigoAcceso", codigoAcceso);
-            ConjuntoReserva outputResult;
-            try{
-                outputResult = (ConjuntoReserva) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized ConjuntoReserva getConjuntoReservaCodigoReserva(String codigoAcceso){
+        Query query = entityManager.createQuery(
+            "SELECT c FROM ConjuntoReserva c " +
+            "WHERE codigo_reserva LIKE :codigoAcceso"
+        )
+        .setParameter("codigoAcceso", codigoAcceso);
+        ConjuntoReserva outputResult;
+        try{
+            outputResult = (ConjuntoReserva) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 }

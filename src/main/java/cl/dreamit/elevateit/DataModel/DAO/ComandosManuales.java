@@ -14,24 +14,19 @@ public enum ComandosManuales {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(ComandoManual[] comandos){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<ComandoManual> comandosList = Arrays.asList(comandos);
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<ComandoManual> it = comandosList.iterator(); it.hasNext();) {
-                    ComandoManual enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(ComandoManual[] comandos){
+        List<ComandoManual> comandosList = Arrays.asList(comandos);
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ComandoManual> it = comandosList.iterator(); it.hasNext();) {
+                ComandoManual enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 }

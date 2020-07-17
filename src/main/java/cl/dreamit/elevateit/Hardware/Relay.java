@@ -1,7 +1,6 @@
 package cl.dreamit.elevateit.Hardware;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 // import java.util.Map;
 // import java.util.HashMap;
@@ -11,11 +10,9 @@ import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
 
 import cl.dreamit.elevateit.Configuration.CONF;
-//@SuppressWarnings("serial")
 public enum Relay {
     INSTANCE;
 
-    private I2CBus busI2C;
     private List<I2CDevice> devicesI2C = new ArrayList<I2CDevice>();;
     private List<Integer> accessPoints = new ArrayList<Integer>();
 
@@ -32,12 +29,14 @@ public enum Relay {
 
     private Relay() {
         try{
-            busI2C = I2CFactory.getInstance(I2CBus.BUS_0);
+            I2CBus busI2C = I2CFactory.getInstance(I2CBus.BUS_0);
+            CONF.CANTIDAD_CANALES = 0;
             for(Integer address : CONF.I2C_ADDRESSES){
                 I2CDevice i2cdevice = busI2C.getDevice(address);
                 devicesI2C.add(i2cdevice);
                 for(int i = 0; i < 16; i++){
                     accessPoints.add(0);
+                    ++CONF.CANTIDAD_CANALES;
                 }
                 i2cdevice.write(0x02, (byte)0x00);
                 i2cdevice.write(0x03, (byte)0x00);
@@ -50,10 +49,11 @@ public enum Relay {
     public void openRelay(int puntoAcceso) {
         new Thread(() -> {
             try{
-                List<Integer> puntosAcceso = Arrays.asList(puntoAcceso);
-                setRelays(puntosAcceso);
+                incAccessPoint(puntoAcceso);
+                setRelays();
                 Thread.sleep(CONF.DEFAULT_OPEN_TIME);
-                releaseRelays(puntosAcceso);
+                decAccessPoint(puntoAcceso);
+                setRelays();
             } catch(Exception ignored) {}
         }).start();
     }
@@ -61,20 +61,51 @@ public enum Relay {
     public void openRelay(List<Integer> puntosAcceso) {
         new Thread(() -> {
             try{
-                setRelays(puntosAcceso);
+                incAccessPoints(puntosAcceso);
+                setRelays();
                 Thread.sleep(CONF.DEFAULT_OPEN_TIME);
-                releaseRelays(puntosAcceso);
+                decAccessPoints(puntosAcceso);
+                setRelays();
             } catch(Exception ignored) {}
         }).start();
     }
 
-    private synchronized void setRelays(List<Integer> puntosAcceso){
-        int writeData = 0;
-        for(int i = 0; i < puntosAcceso.size(); i++){
-            int val = puntosAcceso.get(i).intValue();
-            Integer tempAccessPoint = new Integer(accessPoints.get(val).intValue() + 1);
-            accessPoints.set(val, tempAccessPoint.intValue());
+    private void incAccessPoint(int puntoAcceso){
+        synchronized(accessPoints){
+            Integer tempAccessPoint = new Integer(accessPoints.get(puntoAcceso).intValue() + 1);
+            accessPoints.set(puntoAcceso, tempAccessPoint.intValue());
         }
+    }
+
+    private void incAccessPoints(List<Integer> puntosAcceso){
+        synchronized(accessPoints){
+            for(int i = 0; i < puntosAcceso.size(); i++){
+                int val = puntosAcceso.get(i).intValue();
+                Integer tempAccessPoint = new Integer(accessPoints.get(val).intValue() + 1);
+                accessPoints.set(val, tempAccessPoint.intValue());
+            }
+        }
+    }
+
+    private void decAccessPoint(int puntoAcceso){
+        synchronized(accessPoints){
+            Integer tempAccessPoint = new Integer(accessPoints.get(puntoAcceso).intValue() - 1);
+            accessPoints.set(puntoAcceso, tempAccessPoint.intValue());
+        }
+    }
+
+    private void decAccessPoints(List<Integer> puntosAcceso){
+        synchronized(accessPoints){
+            for(int i = 0; i < puntosAcceso.size(); i++){
+                int val = puntosAcceso.get(i).intValue();
+                Integer tempAccessPoint = new Integer(accessPoints.get(val).intValue() - 1);
+                accessPoints.set(val, tempAccessPoint.intValue());
+            }
+        }
+    }
+
+    private synchronized void setRelays(){
+        int writeData = 0;
         for(int i = 0; i < accessPoints.size(); i++){
             if(accessPoints.get(i).intValue() > 0){
                 writeData |= (1 << i);
@@ -92,26 +123,22 @@ public enum Relay {
         }
     }
 
-    private synchronized void releaseRelays(List<Integer> puntosAcceso){
-        int writeData = 0;
-        for(int i = 0; i < puntosAcceso.size(); i++){
-            int val = puntosAcceso.get(i).intValue();
-            Integer tempAccessPoint = new Integer(accessPoints.get(val).intValue() - 1);
-            accessPoints.set(val, tempAccessPoint.intValue());
-        }
-        for(int i = 0; i < accessPoints.size(); i++){
-            if(accessPoints.get(i).intValue() > 0){
-                writeData |= (1 << i);
-            }
-        }
+    public synchronized void openAll(){
         for(int i = 0; i < devicesI2C.size(); i++){
-            int writeData16 = (writeData >> (16*i));
-            int lowerData = writeData16 & (0xFF);
-            int upperData = (writeData16 >> 8) & (0xFF);
             try{
-                devicesI2C.get(i).write(0x02, (byte)lowerData);
-                devicesI2C.get(i).write(0x03, (byte)upperData);
-            } catch(Exception ex) {}
+                devicesI2C.get(i).write(0x02, (byte)0xFF);
+                devicesI2C.get(i).write(0x03, (byte)0xFF);
+            } catch(Exception ex){}
+            i++;
+        }
+    }
+
+    public synchronized void closeAll(){
+        for(int i = 0; i < devicesI2C.size(); i++){
+            try{
+                devicesI2C.get(i).write(0x02, (byte)0x00);
+                devicesI2C.get(i).write(0x03, (byte)0x00);
+            } catch(Exception ex){}
             i++;
         }
     }

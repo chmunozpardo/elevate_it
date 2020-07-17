@@ -15,40 +15,31 @@ public enum ReservasValidadas implements UploadableDAO<ReservaValidada>{
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(ReservaValidada r){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            try{
-                entityManager.getTransaction().begin();
-                entityManager.persist(r);
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
-            }
-            entityManager.close();
+    public synchronized void save(ReservaValidada r){
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.persist(r);
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public List<ReservaValidada> getNewerThan(int lastID){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT r FROM ReservaValidada r WHERE id > :lastID ORDER BY id ASC"
-            )
-            .setMaxResults(100)
-            .setParameter("lastID", lastID);
-            List<ReservaValidada> outputResult;
-            try {
-                outputResult = (List<ReservaValidada>) query.getResultList();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized List<ReservaValidada> getNewerThan(int lastID){
+        Query query = entityManager.createQuery(
+            "SELECT r FROM ReservaValidada r WHERE id > :lastID ORDER BY id ASC"
+        )
+        .setMaxResults(100)
+        .setParameter("lastID", lastID);
+        List<ReservaValidada> outputResult;
+        try {
+            outputResult = (List<ReservaValidada>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
     public String getTable(){

@@ -15,63 +15,50 @@ public enum Personas {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();;
 
-    public void save(List<Persona> personas) {
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<Persona> personasList = personas;
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<Persona> it = personasList.iterator(); it.hasNext();) {
-                    Persona enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(List<Persona> personas) {
+        List<Persona> personasList = personas;
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<Persona> it = personasList.iterator(); it.hasNext();) {
+                Persona enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public Persona getByCredencial(int idTipoCredencial, String credencial) {
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT p FROM Persona p " +
-                "WHERE id_tipo_credencial = :idTipoCredencial " +
-                "AND credencial LIKE :credencial"
-            )
-            .setParameter("idTipoCredencial", idTipoCredencial)
-            .setParameter("credencial", credencial);
-            Persona outputResult;
-            try {
-                outputResult = (Persona) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized Persona getByCredencial(int idTipoCredencial, String credencial) {
+        Query query = entityManager.createQuery(
+            "SELECT p FROM Persona p " +
+            "WHERE id_tipo_credencial = :idTipoCredencial " +
+            "AND credencial LIKE :credencial"
+        )
+        .setParameter("idTipoCredencial", idTipoCredencial)
+        .setParameter("credencial", credencial);
+        Persona outputResult;
+        try {
+            outputResult = (Persona) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
-    public Persona getById(int id) {
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT p FROM Persona p WHERE id = :id"
-            )
-            .setParameter("id", id);
-            Persona outputResult;
-            try {
-                outputResult = (Persona) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized Persona getById(int id) {
+        Query query = entityManager.createQuery(
+            "SELECT p FROM Persona p WHERE id = :id"
+        )
+        .setParameter("id", id);
+        Persona outputResult;
+        try {
+            outputResult = (Persona) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 }

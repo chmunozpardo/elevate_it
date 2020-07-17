@@ -37,7 +37,7 @@ public class CONF {
 
 
     // Cantidad de canales de control de acceso.
-    public final static int CANTIDAD_CANALES = 16;
+    public static int CANTIDAD_CANALES = 16;
 
     // Si el configuraciones captura huellas o no.
     public final static int CAPTURA_HUELLAS = 0;

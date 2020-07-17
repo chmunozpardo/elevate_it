@@ -61,7 +61,7 @@ public class HttpRequest {
     public String getResponse() {
         String retorno = "";
         String paramURL = this.serializeParameters();
-        Log.info(address + "?" + paramURL, false);
+        Log.info(address + "?" + paramURL);
         while (retrys > 0) {
             HttpURLConnection conexion = null;
             try {
@@ -122,7 +122,9 @@ public class HttpRequest {
             retrys--;
             try{
                 Thread.sleep(5000);
-            } catch (Exception ignored) {}
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Error" + ex);
+            }
         }
         return null;
     }

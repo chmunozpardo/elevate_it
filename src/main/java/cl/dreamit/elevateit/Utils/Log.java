@@ -66,14 +66,8 @@ public class Log {
         }
     }
 
-    public static void info(String s, boolean saveToDB) {
+    public static void info(String s) {
         LOGGER.log(Level.INFO, s);
-        if (saveToDB) {
-            new LogInterno(s).save();
-        }
-    }
-
-    public static void info(boolean save, String format, Object... args) {
-        info(String.format(format, args), save);
+        new LogInterno(s).save();
     }
 }

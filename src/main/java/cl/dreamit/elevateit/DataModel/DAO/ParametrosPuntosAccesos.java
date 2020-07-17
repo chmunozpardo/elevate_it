@@ -15,43 +15,34 @@ public enum ParametrosPuntosAccesos {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public void save(List<ParametroPuntoAcceso> parametrosPuntosAccesos){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            List<ParametroPuntoAcceso> parametrosPuntosAccesosList = parametrosPuntosAccesos;
-            try{
-                entityManager.getTransaction().begin();
-                for (Iterator<ParametroPuntoAcceso> it = parametrosPuntosAccesosList.iterator(); it.hasNext();) {
-                    ParametroPuntoAcceso enquiry = it.next();
-                    entityManager.merge(enquiry);
-                }
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
+    public synchronized void save(List<ParametroPuntoAcceso> parametrosPuntosAccesos){
+        List<ParametroPuntoAcceso> parametrosPuntosAccesosList = parametrosPuntosAccesos;
+        try{
+            entityManager.getTransaction().begin();
+            for (Iterator<ParametroPuntoAcceso> it = parametrosPuntosAccesosList.iterator(); it.hasNext();) {
+                ParametroPuntoAcceso enquiry = it.next();
+                entityManager.merge(enquiry);
             }
-            entityManager.close();
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
-    public ParametroPuntoAcceso getParametroPuntoAcceso(int idPuntoAcceso, String nombreParametro){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT p FROM ParametroPuntoAcceso p WHERE id_punto_acceso = :idPuntoAcceso AND parametro LIKE :nombreParametro"
-            )
-            .setParameter("idPuntoAcceso", idPuntoAcceso)
-            .setParameter("nombreParametro", nombreParametro);
-            ParametroPuntoAcceso outputResult;
-            try {
-                outputResult = (ParametroPuntoAcceso) query.getSingleResult();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized ParametroPuntoAcceso getParametroPuntoAcceso(int idPuntoAcceso, String nombreParametro){
+        Query query = entityManager.createQuery(
+            "SELECT p FROM ParametroPuntoAcceso p WHERE id_punto_acceso = :idPuntoAcceso AND parametro LIKE :nombreParametro"
+        )
+        .setParameter("idPuntoAcceso", idPuntoAcceso)
+        .setParameter("nombreParametro", nombreParametro);
+        ParametroPuntoAcceso outputResult;
+        try {
+            outputResult = (ParametroPuntoAcceso) query.getSingleResult();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 }

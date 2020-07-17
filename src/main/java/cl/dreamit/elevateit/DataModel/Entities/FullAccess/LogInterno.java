@@ -19,7 +19,6 @@ public class LogInterno {
     public String mensaje;
     public String fecha;
 
-    // TODO posible null id?
     public LogInterno(String e){
         super();
         this.mensaje = e;

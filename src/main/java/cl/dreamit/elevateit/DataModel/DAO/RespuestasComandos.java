@@ -15,76 +15,59 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
-    public List<RespuestaComandoManual> getAll(){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT r FROM RespuestaComandoManual r"
-            );
-            List<RespuestaComandoManual> outputResult;
-            try {
-                outputResult = (List<RespuestaComandoManual>) query.getResultList();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized List<RespuestaComandoManual> getAll(){
+        Query query = entityManager.createQuery(
+            "SELECT r FROM RespuestaComandoManual r"
+        );
+        List<RespuestaComandoManual> outputResult;
+        try {
+            outputResult = (List<RespuestaComandoManual>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
-    public List<RespuestaComandoManual> getNewerThan(int lastID){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT r FROM RespuestaComandoManual r WHERE id > :lastID ORDER BY id ASC"
-            )
-            .setMaxResults(100)
-            .setParameter("lastID", lastID);
-            List<RespuestaComandoManual> outputResult;
-            try {
-                outputResult = (List<RespuestaComandoManual>) query.getResultList();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized List<RespuestaComandoManual> getNewerThan(int lastID){
+        Query query = entityManager.createQuery(
+            "SELECT r FROM RespuestaComandoManual r WHERE id > :lastID ORDER BY id ASC"
+        )
+        .setMaxResults(100)
+        .setParameter("lastID", lastID);
+        List<RespuestaComandoManual> outputResult;
+        try {
+            outputResult = (List<RespuestaComandoManual>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
-    public List<RespuestaComandoManual> getNewerThan(int lastID, long offset){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            Query query = entityManager.createQuery(
-                "SELECT r FROM RespuestaComandoManual r WHERE id > :lastID ORDER BY id ASC"
-            )
-            .setFirstResult((int) offset)
-            .setMaxResults(100)
-            .setParameter("lastID", lastID);
-            List<RespuestaComandoManual> outputResult;
-            try {
-                outputResult = (List<RespuestaComandoManual>) query.getResultList();
-            } catch(NoResultException ex) {
-                outputResult = null;
-            }
-            entityManager.close();
-            return outputResult;
+    public synchronized List<RespuestaComandoManual> getNewerThan(int lastID, long offset){
+        Query query = entityManager.createQuery(
+            "SELECT r FROM RespuestaComandoManual r WHERE id > :lastID ORDER BY id ASC"
+        )
+        .setFirstResult((int) offset)
+        .setMaxResults(100)
+        .setParameter("lastID", lastID);
+        List<RespuestaComandoManual> outputResult;
+        try {
+            outputResult = (List<RespuestaComandoManual>) query.getResultList();
+        } catch(NoResultException ex) {
+            outputResult = null;
         }
+        return outputResult;
     }
 
-    public void save(RespuestaComandoManual r){
-        synchronized(this){
-            entityManager = PersistenceManager.INSTANCE.getEntityManager();
-            try{
-                entityManager.getTransaction().begin();
-                entityManager.merge(r);
-                entityManager.getTransaction().commit();
-                entityManager.clear();
-            } catch (Exception ex){
-                entityManager.getTransaction().rollback();
-            }
-            entityManager.close();
+    public synchronized void save(RespuestaComandoManual r){
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(r);
+            entityManager.getTransaction().commit();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
         }
     }
 
