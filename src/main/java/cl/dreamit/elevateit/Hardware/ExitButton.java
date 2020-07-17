@@ -8,6 +8,12 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
+import cl.dreamit.elevateit.DataModel.DAO.Configuraciones;
+import cl.dreamit.elevateit.DataModel.DAO.Controladores;
+import cl.dreamit.elevateit.DataModel.DAO.PuntosAccesos;
+import cl.dreamit.elevateit.DataModel.Entities.FullAccess.Configuracion;
+import cl.dreamit.elevateit.DataModel.Entities.GK2.Controlador;
+import cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso;
 import cl.dreamit.elevateit.Synchronizer.SyncControl;
 
 public enum ExitButton {
@@ -22,10 +28,16 @@ public enum ExitButton {
             new GpioPinListenerDigital() {
                 @Override
                 public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
-                    if(event.getState().isHigh()){
+                    Configuracion id_controlador = Configuraciones.INSTANCE.getParametro("idDevice");
+                    int id = Integer.parseInt(id_controlador.valor);
+                    Controlador controlador = Controladores.INSTANCE.getByID(id);
+                    int canal = 0;
+                    PuntoAcceso puntoAcceso = PuntosAccesos.INSTANCE.getPuntoAccesoControlador(controlador.id, canal);
+                    boolean NC = puntoAcceso.tipoApertura().equals("NC");
+                    if(event.getState().isHigh() == NC){
                         SyncControl.INSTANCE.offSync();
                         Relay.INSTANCE.openAll();
-                    } else if (event.getState().isLow()) {
+                    } else {
                         SyncControl.INSTANCE.onSync();
                         Relay.INSTANCE.closeAll();
                     }
