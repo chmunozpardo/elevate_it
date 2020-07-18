@@ -1,5 +1,6 @@
 package cl.dreamit.elevateit.Utils;
 
+import cl.dreamit.elevateit.Configuration.CONF;
 import cl.dreamit.elevateit.DataModel.Entities.FullAccess.LogInterno;
 
 import java.util.HashMap;
@@ -13,7 +14,7 @@ import java.util.logging.Logger;
 public class Log {
 
     private final static Logger LOGGER =
-                Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+                Logger.getLogger(CONF.LOG_NAME);
     /**
      * Encargado de mostrar un log de error y registrarlo en la base de datos interna
      *

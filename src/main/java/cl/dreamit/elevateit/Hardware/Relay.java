@@ -1,5 +1,6 @@
 package cl.dreamit.elevateit.Hardware;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 // import java.util.Map;
@@ -27,21 +28,25 @@ public enum Relay {
     //     put(7, "Configuration port 1");
     // }};
 
-    private Relay() {
+    public void setup() {
         try{
             I2CBus busI2C = I2CFactory.getInstance(I2CBus.BUS_0);
             CONF.CANTIDAD_CANALES = 0;
-            for(Integer address : CONF.I2C_ADDRESSES){
-                I2CDevice i2cdevice = busI2C.getDevice(address);
-                devicesI2C.add(i2cdevice);
-                for(int i = 0; i < 16; i++){
-                    accessPoints.add(0);
-                    ++CONF.CANTIDAD_CANALES;
+            for(int address = 0x20; address < 0x28; address++){
+                try{
+                    I2CDevice i2cdevice = busI2C.getDevice(address);
+                    i2cdevice.write(0x02, (byte)0x00);
+                    i2cdevice.write(0x03, (byte)0x00);
+                    i2cdevice.write(0x06, (byte)0x00);
+                    i2cdevice.write(0x07, (byte)0x00);
+                    devicesI2C.add(i2cdevice);
+                    for(int i = 0; i < 16; i++){
+                        accessPoints.add(0);
+                        CONF.CANTIDAD_CANALES += 1;
+                    }
+                } catch(IOException ex) {
+                    continue;
                 }
-                i2cdevice.write(0x02, (byte)0x00);
-                i2cdevice.write(0x03, (byte)0x00);
-                i2cdevice.write(0x06, (byte)0x00);
-                i2cdevice.write(0x07, (byte)0x00);
             }
         } catch(Exception ex){}
     }

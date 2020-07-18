@@ -36,6 +36,7 @@ import cl.dreamit.elevateit.DataModel.Entities.GK2.ParametroPuntoAcceso;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.Persona;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso;
 import cl.dreamit.elevateit.DataModel.Entities.GK2.Reserva;
+import cl.dreamit.elevateit.Hardware.Relay;
 import cl.dreamit.elevateit.Utils.HttpRequest;
 import cl.dreamit.elevateit.Utils.Log;
 import cl.dreamit.elevateit.Utils.NetworkUtil;
@@ -307,6 +308,7 @@ public class Synchronizer implements Runnable {
     }
 
     public static void registrarDispositivo(String codigoRegistro) {
+        Relay.INSTANCE.setup();
         HashMap<String, Object> parametrosRegistro = new HashMap<>();
         parametrosRegistro.put("code", codigoRegistro);
         parametrosRegistro.put("ip", NetworkUtil.getAddress("ip"));

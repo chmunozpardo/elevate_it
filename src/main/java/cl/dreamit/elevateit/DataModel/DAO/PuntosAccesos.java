@@ -32,11 +32,10 @@ public enum PuntosAccesos {
         }
     }
 
-    public synchronized PuntoAcceso getPuntoAccesoControlador(int id, int canal){
+    public synchronized PuntoAcceso getPuntoAccesoControlador(int canal){
         Query query = entityManager.createQuery(
-            "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id AND numeroCanal = :canal"
+            "SELECT p FROM PuntoAcceso p WHERE numeroCanal = :canal"
         )
-        .setParameter("id", id)
         .setParameter("canal", canal);
         PuntoAcceso outputResult;
         try {
@@ -47,11 +46,10 @@ public enum PuntosAccesos {
         return outputResult;
     }
 
-    public synchronized List<PuntoAcceso> getPuntosAccesoControlador(int id){
+    public synchronized List<PuntoAcceso> getPuntosAccesoControlador(){
         Query query = entityManager.createQuery(
-            "SELECT p FROM PuntoAcceso p WHERE id_controlador = :id"
-        )
-        .setParameter("id", id);
+            "SELECT p FROM PuntoAcceso p"
+        );
         List<PuntoAcceso> outputResult;
         try {
             outputResult = (List<PuntoAcceso>) query.getResultList();

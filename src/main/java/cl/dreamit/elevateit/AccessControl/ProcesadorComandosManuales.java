@@ -57,7 +57,7 @@ public enum ProcesadorComandosManuales {
         int id = Integer.parseInt(id_controlador.valor);
         Controlador controlador = Controladores.INSTANCE.getByID(id);
         int canal = 0;
-        PuntoAcceso puntoAcceso = PuntosAccesos.INSTANCE.getPuntoAccesoControlador(controlador.id, canal);
+        PuntoAcceso puntoAcceso = PuntosAccesos.INSTANCE.getPuntoAccesoControlador(canal);
         String codigoAcceso =  code_1 + "-" + code_2;
         int validacionMedioAcceso = Operation.INVALID_OPEN;
         int validacionReserva = Operation.INVALID_OPEN;
@@ -148,7 +148,7 @@ public enum ProcesadorComandosManuales {
             }
         }
 
-        Log.info("Permisos totales para la validacion: " + permisosTotales);
+        Log.info("Permisos totales para la validación: " + permisosTotales);
 
         LogAcceso log = new LogAcceso();
         log.id_controlador = controlador.id;

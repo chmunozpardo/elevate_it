@@ -29,6 +29,8 @@ public class CONF {
 
     /****************** VERSIONES ******************/
 
+    public final static String LOG_NAME = "cl.dreamit.elevateit";
+
     // Versión de la base de datos del configuraciones
     public final static int VERSION_DATA_BASE = 1;
 

@@ -41,11 +41,10 @@ public enum ParametrosControladores {
         }
     }
 
-    public synchronized ParametroControlador getParametroControlador(int idControlador, String nombreParametro){
+    public synchronized ParametroControlador getParametroControlador(String nombreParametro){
         Query query = entityManager.createQuery(
-            "SELECT p FROM ParametroControlador p WHERE id_controlador = :idControlador AND parametro LIKE :nombreParametro"
+            "SELECT p FROM ParametroControlador p WHERE parametro LIKE :nombreParametro"
         )
-        .setParameter("idControlador", idControlador)
         .setParameter("nombreParametro", nombreParametro);
         ParametroControlador outputResult;
         try{

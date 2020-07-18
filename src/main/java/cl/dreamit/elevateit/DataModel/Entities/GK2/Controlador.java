@@ -34,7 +34,7 @@ public class Controlador {
      * @return
      */
     public PuntoAcceso obtenerPuntoAcceso(int canal){
-        return PuntosAccesos.INSTANCE.getPuntoAccesoControlador(this.id, canal);
+        return PuntosAccesos.INSTANCE.getPuntoAccesoControlador(canal);
     }
 
     /**
@@ -44,15 +44,15 @@ public class Controlador {
      * @return
      */
     public String obtenerValorParametro(String parametro) {
-        ParametroControlador p = ParametrosControladores.INSTANCE.getParametroControlador(this.id, parametro);
+        ParametroControlador p = ParametrosControladores.INSTANCE.getParametroControlador(parametro);
         if (p == null) {
             return null;
         }
         return p.valor_override != null ? p.valor_override : p.valor;
     }
 
-    public ParametroControlador obtenerParametro(String nombreParametro) {
-        return ParametrosControladores.INSTANCE.getParametroControlador(this.id, nombreParametro);
+    public ParametroControlador obtenerParametro(String parametro) {
+        return ParametrosControladores.INSTANCE.getParametroControlador(parametro);
     }
 
     /**
@@ -77,6 +77,6 @@ public class Controlador {
     }
 
     public List<PuntoAcceso> obtenerPuntosAcceso() {
-        return PuntosAccesos.INSTANCE.getPuntosAccesoControlador(this.id);
+        return PuntosAccesos.INSTANCE.getPuntosAccesoControlador();
     }
 }
