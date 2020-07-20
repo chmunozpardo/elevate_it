@@ -111,6 +111,7 @@ mvn exec:java@register
 ```
 
 Al momento de sincronizar se limpiarán las tablas si es que ya hay datos existentes.
+
 Para ejecutar el programa principal, se debe usar:
 ```
 mvn exec:exec@main
@@ -122,8 +123,10 @@ Para dejar la central corriendo libre, se puede usar `screen`:
 sudo apt install screen
 ```
 
-Luego ejectura:
+Antes de usar `screen`, leer sobre cómo despegarse y pegarse a una sesión.
+
+Luego ejecutar:
 
 ```
-screen mvn exec:exec@main
+screen -d -m mvn exec:exec@main
 ```
