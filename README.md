@@ -87,7 +87,7 @@ git clone https://github.com/Pi4J/pi4j
 cd pi4j
 mvn clean install -P all-platforms,local-compile
 cd pi4j-distribution/target
-sudo apt install ./pi4j-1.2-SNAPSHOT.deb
+sudo apt install ./pi4j-1.3-SNAPSHOT.deb
 ```
 
 Luego de esto, la librería debería estar disponible para usar. Para confirmar se debe usar el comando:
