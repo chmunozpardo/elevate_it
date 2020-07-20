@@ -88,9 +88,13 @@ public class Synchronizer implements Runnable {
         while(true){
             if(SyncControl.INSTANCE.getState()){
                 try{
-                    LogsAcceso.INSTANCE.clean();
-                    LogsInternos.INSTANCE.clean();
+                    Thread cleanThread = new Thread(()-> {
+                        LogsAcceso.INSTANCE.clean();
+                        LogsInternos.INSTANCE.clean();
+                    });
+                    cleanThread.start();
                     Thread.sleep(CONF.TIME_SYNC);
+                    cleanThread.join();
                 } catch (InterruptedException ex){}
                 SyncMessage message = new SyncMessage(lastSyncTimestamp);
                 Map<String, Long> ultimosID = cargarDatos(message);

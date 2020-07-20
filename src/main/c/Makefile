@@ -3,13 +3,13 @@ JAVA_HOME:=${JAVA_HOME}
 INCLUDES:=-I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 OUTPUT:=/usr/lib/libelevateit.so
 
-all: WiegandReader.o Buzzer.o
-	gcc -Wall -fPIC -shared -o $(OUTPUT) $^ $(LIBS)
+SOURCES:=WiegandReader.c Buzzer.c
+OBJECTS=$(SOURCES:.c=.o)
 
-WiegandReader.o: WiegandReader.c
-	gcc -fPIC $(INCLUDES) -c $< -o $@
+all: $(OBJECTS)
+	gcc -Wall -fPIC -shared -o $(OUTPUT) $(OBJECTS) $(LIBS)
 
-Buzzer.o: Buzzer.c
+%.o: %.c
 	gcc -fPIC $(INCLUDES) -c $< -o $@
 
 .PHONY: clean

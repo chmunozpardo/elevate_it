@@ -1,5 +1,15 @@
 # **Instrucciones instalación**
 
+Antes de comenzar, recomiendo actualizar los paquetes del sistema operativo:
+
+
+```
+sudo apt update
+sudo apt dist-upgrade
+```
+
+Esto puede tomar varios minutos.
+
 # Instalar `mariadb-server`
 
 Se debe instalar el servidor de bases de datos `mariadb` para almacenar la información recibida desde la API de GK2:
@@ -20,6 +30,14 @@ Y finalmente crear la base de datos `elevate_it`:
 ```
 mysql -u admin -p
 CREATE DATABASE elevate_it;
+```
+
+# Instalar `WiringNP` modificado
+
+Para habilitar un par de funcionalidades se tuvo que cambiar un par de cosas en la librería de WiringNP, que se encarga de interactura con los GPIOs del procesador. La versión modificada se encuentra en el siguiente repositorio:
+
+```
+https://github.com/chmunozpardo/WiringNP-Neo-Plus2
 ```
 
 # Instalar `pi4j`
@@ -86,13 +104,26 @@ Para esto hay que correr el siguiente comando desde la carpeta principal:
 mvn compile
 ```
 
-Para realizar una sincronización, se debe usar:
+Para realizar el registro del controlador se debe usar:
 
 ```
-mvn exec:java@sync
+mvn exec:java@register
 ```
 
-Al momento de sincronizar se limpiarán las tablas si es que ya hay datos existentes. Para ejecutar el programa principal, se debe usar:
+Al momento de sincronizar se limpiarán las tablas si es que ya hay datos existentes.
+Para ejecutar el programa principal, se debe usar:
 ```
 mvn exec:exec@main
+```
+
+Para dejar la central corriendo libre, se puede usar `screen`:
+
+```
+sudo apt install screen
+```
+
+Luego ejectura:
+
+```
+screen mvn exec:exec@main
 ```

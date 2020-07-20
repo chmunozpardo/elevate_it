@@ -22,10 +22,10 @@ public class CONF {
     public final static String API_URL = "http://192.168.1.89:8080/";
 
     // Ruta con la cual se registra y obtiene el API Token
-    public final static String URL_REGISTER_DEVICE = "androidFullAccess/register";
+    public final static String URL_REGISTER_DEVICE = "controladorElevateIT/register";
 
     // Ruta que utiliza para la sincronizacion de datos hacia la nube mediante el Api de GK2
-    public final static String URL_SYNC_DATA = "androidFullAccess/syncData";
+    public final static String URL_SYNC_DATA = "controladorElevateIT/syncData";
 
     /****************** VERSIONES ******************/
 
