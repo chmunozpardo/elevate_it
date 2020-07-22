@@ -27,6 +27,7 @@ public enum CanalesHorarios {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -45,6 +46,7 @@ public enum CanalesHorarios {
         } catch (NoResultException ex){
             outputCanalHorario = null;
         }
+        entityManager.clear();
         return outputCanalHorario;
     }
 }

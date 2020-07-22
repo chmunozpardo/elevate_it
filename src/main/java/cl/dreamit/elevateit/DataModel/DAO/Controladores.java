@@ -27,6 +27,7 @@ public enum Controladores {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -37,6 +38,7 @@ public enum Controladores {
             entityManager.getTransaction().begin();
             entityManager.merge(controlador);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -51,6 +53,7 @@ public enum Controladores {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -67,6 +70,7 @@ public enum Controladores {
         } catch(NoResultException ex){
             outputControlador = null;
         }
+        entityManager.clear();
         return outputControlador;
     }
 }

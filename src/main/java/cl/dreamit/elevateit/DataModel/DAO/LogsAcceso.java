@@ -29,6 +29,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -44,6 +45,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -60,6 +62,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -68,6 +71,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
             entityManager.getTransaction().begin();
             entityManager.persist(acceso);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -83,6 +87,7 @@ public enum LogsAcceso implements UploadableDAO<LogAcceso>{
             .setParameter("date", Util.getDateTime(date));
             query.executeUpdate();
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             System.out.println("Couldn't clean" + ex);
         }

@@ -27,6 +27,7 @@ public enum Configuraciones {
         } catch(NoResultException ex) {
             outConfiguracion = null;
         }
+        entityManager.clear();
         return outConfiguracion;
     }
 
@@ -41,6 +42,7 @@ public enum Configuraciones {
         } catch(NoResultException ex) {
             outConfiguracion = null;
         }
+        entityManager.clear();
         return outConfiguracion;
     }
 
@@ -49,6 +51,7 @@ public enum Configuraciones {
             entityManager.getTransaction().begin();
             entityManager.merge(p);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }

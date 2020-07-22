@@ -26,6 +26,7 @@ public enum ParametrosControladores {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -36,6 +37,7 @@ public enum ParametrosControladores {
             entityManager.getTransaction().begin();
             entityManager.merge(parametro);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -52,6 +54,7 @@ public enum ParametrosControladores {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 }

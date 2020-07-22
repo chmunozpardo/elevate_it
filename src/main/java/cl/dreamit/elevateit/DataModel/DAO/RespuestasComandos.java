@@ -27,6 +27,7 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -42,6 +43,7 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -58,6 +60,7 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -66,6 +69,7 @@ public enum RespuestasComandos implements UploadableDAO<RespuestaComandoManual>{
             entityManager.getTransaction().begin();
             entityManager.merge(r);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }

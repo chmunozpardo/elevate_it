@@ -26,6 +26,7 @@ public enum ParametrosPuntosAccesos {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -43,6 +44,7 @@ public enum ParametrosPuntosAccesos {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 }

@@ -15,13 +15,14 @@ public enum LogsInternos {
     INSTANCE;
 
     @PersistenceContext
-    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();;
+    private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
     public synchronized void save(LogInterno log){
         try{
             entityManager.getTransaction().begin();
             entityManager.persist(log);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -37,6 +38,7 @@ public enum LogsInternos {
             .setParameter("date", Util.getDateTime(date));
             query.executeUpdate();
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             System.out.println("Couldn't clean" + ex);
         }

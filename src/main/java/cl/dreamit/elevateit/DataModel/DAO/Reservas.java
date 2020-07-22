@@ -28,6 +28,7 @@ public enum Reservas {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -43,6 +44,7 @@ public enum Reservas {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -60,6 +62,7 @@ public enum Reservas {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -78,6 +81,7 @@ public enum Reservas {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -93,6 +97,7 @@ public enum Reservas {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -111,6 +116,7 @@ public enum Reservas {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 }

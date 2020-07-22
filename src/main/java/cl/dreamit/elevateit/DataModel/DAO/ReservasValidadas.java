@@ -22,6 +22,7 @@ public enum ReservasValidadas implements UploadableDAO<ReservaValidada>{
             entityManager.getTransaction().begin();
             entityManager.persist(r);
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -39,6 +40,7 @@ public enum ReservasValidadas implements UploadableDAO<ReservaValidada>{
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 

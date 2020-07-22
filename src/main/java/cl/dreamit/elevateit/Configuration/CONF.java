@@ -11,14 +11,14 @@ public class CONF {
 
     /****************** VARIABLES QUE DETERMINAN TIEMPO ******************/
 
-    // Tiempo en que ejecutara un nuevo ciclo de sincronización
+    // Tiempo en que ejecutará un nuevo ciclo de sincronización
     public static int TIME_SYNC = 1000;
 
-    // Tiempo en que se ejecutara un PING de estado
+    // Tiempo en que se ejecutará un PING de estado
     public final static int TIME_CHECK_STATE = 5000;
 
-    //Ruta de la API. esto está almacenado en el archivo Gradle 'build.grade' del módulo Full-Access.
-    //Por defecto Development apunta a una ruta 'http://api.gk2-test', y en release cambia a 'https://gk2-api.gestkontrol.cl/'
+    // Ruta de la API.
+    // Por defecto Development apunta a una ruta 'http://api.gk2-test', y en release cambia a 'https://gk2-api.gestkontrol.cl/'
     public final static String API_URL = "http://192.168.1.89:8080/";
 
     // Ruta con la cual se registra y obtiene el API Token

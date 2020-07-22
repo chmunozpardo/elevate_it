@@ -6,13 +6,17 @@ import javax.persistence.Persistence;
 
 public enum PersistenceManager {
     INSTANCE;
+
     private EntityManagerFactory emFactory;
+
     private PersistenceManager() {
       emFactory = Persistence.createEntityManagerFactory("elevateIT");
     }
+
     public EntityManager getEntityManager() {
       return emFactory.createEntityManager();
     }
+
     public void close() {
       emFactory.close();
     }

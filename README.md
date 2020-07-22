@@ -32,6 +32,12 @@ mysql -u admin -p
 CREATE DATABASE elevate_it;
 ```
 
+Por motivos de consumo de la memoria RAM, agregar la siguiente línea al archivo `/etc/mysql/mariadb.conf.d/50-server.cnf`:
+
+```
+performance_schema = 0
+```
+
 # Instalar `WiringNP` modificado
 
 Para habilitar un par de funcionalidades se tuvo que cambiar un par de cosas en la librería de WiringNP, que se encarga de interactura con los GPIOs del procesador. La versión modificada se encuentra en el siguiente repositorio:

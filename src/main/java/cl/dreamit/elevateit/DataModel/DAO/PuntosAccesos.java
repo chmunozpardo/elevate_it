@@ -27,6 +27,7 @@ public enum PuntosAccesos {
                 entityManager.merge(enquiry);
             }
             entityManager.getTransaction().commit();
+            entityManager.clear();
         } catch (Exception ex){
             entityManager.getTransaction().rollback();
         }
@@ -43,6 +44,7 @@ public enum PuntosAccesos {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 
@@ -56,6 +58,7 @@ public enum PuntosAccesos {
         } catch(NoResultException ex) {
             outputResult = null;
         }
+        entityManager.clear();
         return outputResult;
     }
 }
