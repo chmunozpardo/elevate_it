@@ -134,6 +134,7 @@ public class Synchronizer implements Runnable {
                         switch (syncResponse.error) {
                             case "":
                                 Log.error("Error no especificado. Revisar plataforma");
+                                System.exit(0);
                                 break;
                             case SYNC_ERROR.INVALID_API_TOKEN:
                                 Log.error("El API Token no es válido.");
