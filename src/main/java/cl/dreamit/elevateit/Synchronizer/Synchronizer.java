@@ -71,9 +71,22 @@ public class Synchronizer implements Runnable {
     );
 
     public Synchronizer() {
-        apiToken = Configuraciones.INSTANCE.getParametro("apitoken").valor;
-        targetDatabase = Configuraciones.INSTANCE.getParametro("base_datos").valor;
-        apiURL = Configuraciones.INSTANCE.getParametro("API_URL").valor;
+        Configuracion token = Configuraciones.INSTANCE.getParametro("apitoken");
+        Configuracion database = Configuraciones.INSTANCE.getParametro("base_datos");
+        Configuracion url = Configuraciones.INSTANCE.getParametro("API_URL");
+        if(token == null) {
+            Log.error("No existe apitoken. Se debe registrar el dispositivo.");
+            System.exit(0);
+        } else if(database == null) {
+            Log.error("No existe base_datos. Se debe registrar el dispositivo.");
+            System.exit(0);
+        } else if(url == null) {
+            Log.error("No existe API_RUL. Se debe registrar el dispositivo.");
+            System.exit(0);
+        }
+        apiToken = token.valor;
+        targetDatabase = database.valor;
+        apiURL = url.valor;
     }
 
     public void run() {
@@ -120,16 +133,18 @@ public class Synchronizer implements Runnable {
                     } else if (syncResponse.estado.equals("ERROR")) {
                         switch (syncResponse.error) {
                             case "":
-                                Log.info("Error no especificado. Revisar plataforma");
+                                Log.error("Error no especificado. Revisar plataforma");
                                 break;
                             case SYNC_ERROR.INVALID_API_TOKEN:
-                                Log.info("El API Token no es válido.");
+                                Log.error("El API Token no es válido.");
+                                System.exit(0);
                                 break;
                         }
                     }
                 } catch (Exception ex) {
-                    Log.info("Error decodificando JSON: " + ex.getMessage());
-                    Log.info("URL: " + request.toString());
+                    Log.error("Error decodificando JSON: " + ex.getMessage());
+                    Log.error("URL: " + request.toString());
+                    Log.error("Respuesta: " + respuesta);
                     ex.printStackTrace();
                 }
             }
@@ -338,7 +353,7 @@ public class Synchronizer implements Runnable {
             RespuestaRegistroGK respuestaGK = new Gson().fromJson(respuesta, RespuestaRegistroGK.class);
             if (respuestaGK.estado.equals("OK")) {
                 if (respuestaGK.apitoken == null || respuestaGK.base_datos == null || respuestaGK.idDevice == null) {
-                    Log.info("Parámetros de respuesta incompletos");
+                    Log.error("Parámetros de respuesta incompletos");
                 } else {
                     Configuraciones.INSTANCE.save(new Configuracion(Parametro.API_TOKEN, respuestaGK.apitoken));
                     Configuraciones.INSTANCE.save(new Configuracion(Parametro.DATABASE, respuestaGK.base_datos));
@@ -346,11 +361,11 @@ public class Synchronizer implements Runnable {
                     Log.info("Registro de configuraciones correcto");
                 }
             } else {
-                Log.info("Estado de respuesta erróneo");
+                Log.error("Estado de respuesta erróneo");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            Log.info("Exception en respuesta");
+            Log.error("Exception en respuesta");
         }
     }
 }

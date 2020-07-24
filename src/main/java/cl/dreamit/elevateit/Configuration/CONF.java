@@ -19,7 +19,7 @@ public class CONF {
 
     // Ruta de la API.
     // Por defecto Development apunta a una ruta 'http://api.gk2-test', y en release cambia a 'https://gk2-api.gestkontrol.cl/'
-    public final static String API_URL = "http://192.168.1.89:8080/";
+    public final static String API_URL = "https://alpha-api.gestkontrol.cl/";
 
     // Ruta con la cual se registra y obtiene el API Token
     public final static String URL_REGISTER_DEVICE = "controladorElevateIT/register";
@@ -44,8 +44,8 @@ public class CONF {
     // Si el configuraciones captura huellas o no.
     public final static int CAPTURA_HUELLAS = 0;
 
-    // Tiempo de apertura por defecto en milisegundos
-    public final static int DEFAULT_OPEN_TIME = 5000;
+    // Tiempo de apertura por defecto en segundos
+    public final static int DEFAULT_OPEN_TIME = 5;
 
     public final static String MODEL = "elevateIT";
 
