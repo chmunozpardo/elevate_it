@@ -170,4 +170,21 @@ public class PuntoAcceso {
     public String toString() {
         return new Gson().toJson(this);
     }
+
+    @Override
+    public boolean equals(Object p){
+        if (this == p) {
+            return true;
+        }
+        if (!(p instanceof PuntoAcceso)) {
+            return false;
+        }
+        PuntoAcceso punto = (PuntoAcceso) p;
+        return nombre == punto.nombre &&
+               numeroCanal == punto.numeroCanal &&
+               estado == punto.estado &&
+               id_controlador == punto.id_controlador &&
+               compartido == punto.compartido &&
+               id_area_subarea == punto.id_area_subarea;
+    }
 }
