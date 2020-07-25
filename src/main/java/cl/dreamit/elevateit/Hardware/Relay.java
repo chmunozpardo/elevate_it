@@ -10,7 +10,6 @@ import com.pi4j.io.i2c.I2CFactory;
 
 import cl.dreamit.elevateit.Configuration.CONF;
 import cl.dreamit.elevateit.DataModel.DAO.PuntosAccesos;
-import cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso;
 
 public enum Relay {
     INSTANCE;
@@ -18,12 +17,6 @@ public enum Relay {
     private List<I2CDevice> devicesI2C = new ArrayList<I2CDevice>();;
     private List<Integer> accessPoints = new ArrayList<Integer>();
 
-    private void sleepRelay(){
-        int sleepTime = PuntosAccesos.INSTANCE.getPuntoAccesoControlador(0).tiempoApertura();
-        try{
-            Thread.sleep(sleepTime*1000);
-        } catch(Exception ex){}
-    }
     // I2C registers
     // 0, "Input port 0"
     // 1, "Input port 1"
@@ -33,6 +26,13 @@ public enum Relay {
     // 5, "Polarity inversion port 1"
     // 6, "Configuration port 0"
     // 7, "Configuration port 1"
+
+    private void sleepRelay(){
+        int sleepTime = PuntosAccesos.INSTANCE.getPuntoAccesoControlador(0).tiempoApertura();
+        try{
+            Thread.sleep(sleepTime*1000);
+        } catch(Exception ex){}
+    }
 
     public void setup() {
         try{

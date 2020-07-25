@@ -3,7 +3,6 @@ package cl.dreamit.elevateit.DataModel.Entities.FullAccess;
 import cl.dreamit.elevateit.DataModel.DAO.LogsInternos;
 import cl.dreamit.elevateit.Utils.Util;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;

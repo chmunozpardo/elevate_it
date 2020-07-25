@@ -4,19 +4,18 @@
 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
   version="2.1">
   <persistence-unit name="elevateIT" transaction-type="RESOURCE_LOCAL">
-  <provider>org.hibernate.ejb.HibernatePersistence</provider>
-  <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode>
   <properties>
-    <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
-    <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost/elevate_it" />
+    <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+    <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test,DB_CLOSE_DELAY=-1" />
     <property name="javax.persistence.jdbc.user" value="admin" />
     <property name="javax.persistence.jdbc.password" value="admin" />
-    <property name="hibernate.show_sql" value="false" />
+    <property name="hibernate.show_sql" value="true" />
     <property name="hibernate.format_sql" value="true" />
-    <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" />
-    <property name="hibernate.hbm2ddl.auto" value="update"/>
+    <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+    <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
     <property name="hibernate.cache.use_query_cache" value="false"/>
     <property name="hibernate.cache.use_second_level_cache" value="false"/>
+    <property name="hibernate.temp.use_jdbc_metadata_defaults" value="false"/>
     <property name="org.hibernate.flushMode" value="COMMIT"/>
     </properties>
   </persistence-unit>
