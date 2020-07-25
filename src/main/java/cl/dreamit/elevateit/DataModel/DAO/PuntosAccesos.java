@@ -18,6 +18,17 @@ public enum PuntosAccesos {
     @PersistenceContext
     private EntityManager entityManager = PersistenceManager.INSTANCE.getEntityManager();
 
+    public synchronized void save(PuntoAcceso punto){
+        try{
+            entityManager.getTransaction().begin();
+            entityManager.merge(punto);
+            entityManager.getTransaction().commit();
+            entityManager.clear();
+        } catch (Exception ex){
+            entityManager.getTransaction().rollback();
+        }
+    }
+
     public synchronized void save(List<PuntoAcceso> puntos){
         List<PuntoAcceso> reservasList = puntos;
         try{

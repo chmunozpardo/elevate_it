@@ -135,6 +135,9 @@ public class HttpRequest {
 
     public String toString() {
         String paramURL = this.serializeParameters();
+        try{
+            paramURL = java.net.URLDecoder.decode(paramURL, StandardCharsets.UTF_8.toString());
+        } catch(UnsupportedEncodingException exp) {}
         return address + "?" + paramURL;
     }
 }

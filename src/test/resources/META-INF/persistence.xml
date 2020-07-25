@@ -4,13 +4,17 @@
 http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
   version="2.1">
   <persistence-unit name="elevateIT" transaction-type="RESOURCE_LOCAL">
+  <class>cl.dreamit.elevateit.DataModel.Entities.FullAccess.Configuracion</class>
+  <class>cl.dreamit.elevateit.DataModel.Entities.FullAccess.ReservaValidada</class>
+  <class>cl.dreamit.elevateit.DataModel.Entities.FullAccess.LogInterno</class>
+  <class>cl.dreamit.elevateit.DataModel.Entities.GK2.PuntoAcceso</class>
   <properties>
     <property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
     <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:test,DB_CLOSE_DELAY=-1" />
     <property name="javax.persistence.jdbc.user" value="admin" />
     <property name="javax.persistence.jdbc.password" value="admin" />
-    <property name="hibernate.show_sql" value="true" />
-    <property name="hibernate.format_sql" value="true" />
+    <property name="hibernate.show_sql" value="false" />
+    <property name="hibernate.format_sql" value="false" />
     <property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
     <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
     <property name="hibernate.cache.use_query_cache" value="false"/>

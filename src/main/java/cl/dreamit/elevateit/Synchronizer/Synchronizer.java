@@ -133,7 +133,7 @@ public class Synchronizer implements Runnable {
                     } else if (syncResponse.estado.equals("ERROR")) {
                         switch (syncResponse.error) {
                             case "":
-                                Log.error("Error no especificado. Revisar plataforma");
+                                Log.error("Error no especificado, revisar plataforma.");
                                 System.exit(0);
                                 break;
                             case SYNC_ERROR.INVALID_API_TOKEN:
@@ -144,7 +144,7 @@ public class Synchronizer implements Runnable {
                     }
                 } catch (Exception ex) {
                     Log.error("Error decodificando JSON: " + ex.getMessage());
-                    Log.error("URL: " + request.toString());
+                    Log.error("Consulta API: " + request.toString());
                     Log.error("Respuesta: " + respuesta);
                     ex.printStackTrace();
                 }
